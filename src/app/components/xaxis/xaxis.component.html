@@ -1,0 +1,10 @@
+<div class="wrapper">
+  <div class="g-spacer"></div>
+  <ng-container *ngFor="let col of columns | async; index as i">
+    <app-header 
+      type="column" 
+      [content]="(col.index[1] | cellIndex).toString()"
+      (onResize)="changeColumnWidth(i, $event)"
+    ></app-header>
+  </ng-container>
+</div>

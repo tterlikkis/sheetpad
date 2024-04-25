@@ -1,0 +1,13 @@
+<div class="x-spacer"></div>
+<div class="fr">
+  <div class="y-spacer"></div>
+  <div class="fc">
+    <ng-container *ngFor="let row of rows | async">
+      <div class="row">
+        <ng-container *ngFor="let col of columns | async">
+          <app-cell [width]="col.width" [height]="row.height"></app-cell>
+        </ng-container>
+      </div>
+    </ng-container>
+  </div>
+</div>

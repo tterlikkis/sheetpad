@@ -1,12 +1,15 @@
-import { Component } from '@angular/core';
+import { Pipe, PipeTransform } from '@angular/core';
 
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+@Pipe({
+  name: 'cellIndex'
 })
-export class AppComponent {
-  title = 'sheetpad';
+export class CellIndexPipe implements PipeTransform {
+
+  transform(value: unknown, ...args: unknown[]): string | number {
+    if (typeof value === "number") return this.numberToString(value);
+    if (typeof value === "string") return this.stringToNumber(value);
+    return "";
+  }
 
   public numberToString(index: number): string {
     if (index < 26) return String.fromCharCode(index + 65);
@@ -23,7 +26,7 @@ export class AppComponent {
 
   public stringToNumber(indexCode: string): number {
     const regex = /[A-Z]+/g
-    if (!indexCode.match(regex)) return 1;
+    if (!indexCode.match(regex)) return -1;
     let pos, idx, sum = 0;
     for (pos = 0, idx = indexCode.length - 1; idx > -1; pos++, idx--) {
       const digit = indexCode.charCodeAt(idx) - 64;
@@ -31,4 +34,5 @@ export class AppComponent {
     }
     return sum;
   }
+
 }

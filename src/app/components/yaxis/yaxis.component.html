@@ -1,0 +1,10 @@
+<div class="wrapper">
+  <div class="g-spacer"></div>
+  <ng-container *ngFor="let row of rows | async; index as i">
+    <app-header 
+      type="row" 
+      [content]="(row.index[0  ] + 1).toString()"
+      (onResize)="changeRowHeight(i, $event)"
+    ></app-header>
+  </ng-container>
+</div>

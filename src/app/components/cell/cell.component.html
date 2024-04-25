@@ -1,0 +1,11 @@
+<div class="wrapper" (click)="onClick()">
+  <div class="display">{{ value }}</div>
+  <input
+    #input
+    class="edit-box" 
+    [size]="value.length | cellInputWidth"
+    [hidden]="!showInput" 
+    [(ngModel)]="value" 
+    (focusout)="focusOut()"
+  >
+</div>

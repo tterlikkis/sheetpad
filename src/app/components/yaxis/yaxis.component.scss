@@ -1,0 +1,21 @@
+:host {
+  position: fixed;
+  top: 0px;
+  left: 0;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  width: var(--y-axis-width);
+}
+
+// .header {
+//   background: #b2b2b2;
+//   border: solid;
+//   border-width: 0.5px;
+//   border-color: #101010;
+//   display: flex;
+//   flex-direction: row;
+//   justify-content: center;
+// }

@@ -1,0 +1,5 @@
+<div #header class="header" [style.width]="width">
+  {{ content }}
+  <div [class]="zoneClass" (mousedown)="dragFunction($event)"></div>
+</div>
+<div #bar [class]="barClass"></div>

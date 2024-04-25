@@ -1,1 +1,24 @@
 /* You can add global styles to this file, and also import other style files */
+:root {
+  --y-axis-width: 28px;
+  --my-red: #ff0000;
+}
+
+body {
+  margin: 0px;
+}
+
+.g-spacer {
+  width: var(--y-axis-width) !important;
+  height: 20px;
+}
+
+.fc {
+  display: flex;
+  flex-direction: column;
+}
+
+.fr {
+  display: flex;
+  flex-direction: row;
+}

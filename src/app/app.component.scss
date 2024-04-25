@@ -1,0 +1,9 @@
+.rug {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 20px;
+  width: var(--y-axis-width);
+  background-color: aqua;
+  z-index: 10;
+}

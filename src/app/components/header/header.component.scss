@@ -1,0 +1,49 @@
+.header {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background-color: aquamarine;
+  height: 100%;
+}
+
+.column-zone {
+  position: absolute;
+  width: 4px;
+  top: 0;
+  bottom: 0;
+  right: -2px;
+  background-color: brown;
+  cursor: col-resize;
+}
+
+.column-bar {
+  height: 100vh;
+  width: 3px;
+  z-index: 10;
+  background-color: #1f1f1f;
+  display: none;
+  position: absolute;
+  cursor: col-resize;
+}
+
+.row-zone {
+  position: absolute;
+  height: 4px;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  background-color: brown;
+  cursor: row-resize;
+}
+
+.row-bar {
+  height: 4px;
+  width: 100vw;
+  z-index: 10;
+  background-color: #1f1f1f;
+  display: none;
+  position: absolute;
+  cursor: row-resize;
+}

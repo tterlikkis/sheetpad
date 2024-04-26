@@ -1,19 +1,17 @@
-import { Component, ElementRef, HostBinding, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostBinding, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-cell',
   templateUrl: './cell.component.html',
   styleUrls: ['./cell.component.scss']
 })
-export class CellComponent implements OnChanges {
+export class CellComponent implements OnChanges, AfterViewInit {
 
   @ViewChild("input") input?: ElementRef;
-  @HostBinding("style.width.px") @Input() width!: number;
-  @HostBinding("style.maxWidth.px") maxWidth!: number
-  @HostBinding("style.minWidth.px") minWidth!: number;
-  @HostBinding("style.height.px") @Input() height!: number;
-  @HostBinding("style.maxHeight.px") maxHeight!: number;
-  @HostBinding("style.minHeight.px") minHeight!: number;
+  @ViewChild("cell") cell?: ElementRef;
+
+  @Input() width: number = 80;
+  @Input() height: number = 20
 
   showInput: boolean = false;
   value: string = "";
@@ -21,14 +19,17 @@ export class CellComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if ("width" in changes) {
       this.width = changes["width"].currentValue;
-      this.maxWidth = this.width;
-      this.minWidth = this.width;
+      this._setCellWidth()
     }
     if ("height" in changes) {
       this.height = changes["height"].currentValue;
-      this.maxHeight = this.height;
-      this.minHeight = this.height;
+      this._setCellHeight();
     }
+  }
+
+  ngAfterViewInit(): void {
+    this._setCellWidth();
+    this._setCellHeight();
   }
 
   onClick() {
@@ -38,5 +39,21 @@ export class CellComponent implements OnChanges {
 
   focusOut() {
     this.showInput = false;
+  }
+
+  private _setCellWidth() {
+    if (!this.cell) return;
+    const str = `${this.width}px`
+    this.cell.nativeElement.style.width = str;
+    this.cell.nativeElement.style.maxWidth = str;
+    this.cell.nativeElement.style.minWidth = str;
+  }
+
+  private _setCellHeight() {
+    if (!this.cell) return;
+    const str = `${this.height}px`
+    this.cell.nativeElement.style.height = str;
+    this.cell.nativeElement.style.maxHeight = str;
+    this.cell.nativeElement.style.minHeight = str;
   }
 }

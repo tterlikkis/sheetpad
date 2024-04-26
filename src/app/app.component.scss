@@ -1,9 +1,10 @@
 .rug {
+  border-color: var(--header-border);
   position: fixed;
   top: 0;
   left: 0;
   height: 20px;
   width: var(--y-axis-width);
-  background-color: aqua;
+  background-color: var(--header-bg);
   z-index: 10;
 }

@@ -59,8 +59,6 @@ export class HeaderComponent implements OnInit {
     this.bar.nativeElement.style.display = 'block';
     this.bar.nativeElement.style.top = `${event.clientY}px`;
     this.bar.nativeElement.style.left = `${rect.left}px`;
-    console.log(event)
-    console.log(event.clientY)
     const duringDrag = (event: MouseEvent) => {
       if (rect.top < event.clientY)
         this.bar.nativeElement.style.top = `${event.clientY}px`;

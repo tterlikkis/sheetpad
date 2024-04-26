@@ -1,6 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 :root {
   --y-axis-width: 28px;
+  --header-bg: #bbbbbb;
+  --header-border: #4f4f4f;
   --my-red: #ff0000;
 }
 
@@ -9,8 +11,14 @@ body {
 }
 
 .g-spacer {
-  width: var(--y-axis-width) !important;
+  width: calc(var(--y-axis-width) + 0px) !important;
   height: 20px;
+}
+
+.g-border {
+  border-right: solid;
+  border-bottom: solid;
+  border-width: 1px;
 }
 
 .fc {

@@ -4,8 +4,8 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  background-color: aquamarine;
-  height: 100%;
+  background-color: var(--header-bg);
+  height: 20px;
 }
 
 .column-zone {
@@ -14,7 +14,7 @@
   top: 0;
   bottom: 0;
   right: -2px;
-  background-color: brown;
+  // background-color: var(--header-border);
   cursor: col-resize;
 }
 
@@ -34,7 +34,7 @@
   left: 0;
   right: 0;
   bottom: -2px;
-  background-color: brown;
+  // background-color: var(--header-border);
   cursor: row-resize;
 }
 

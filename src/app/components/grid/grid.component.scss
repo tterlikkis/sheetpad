@@ -14,6 +14,7 @@
 }
 
 .y-spacer {
+  min-width: var(--y-axis-width) !important;
   width: var(--y-axis-width) !important;
   height: 100vh;
 }

@@ -2,10 +2,17 @@
 <div class="fr">
   <div class="y-spacer"></div>
   <div class="fc">
-    <ng-container *ngFor="let row of rows | async">
+    <ng-container *ngFor="let row of grid | async; index as i">
       <div class="row">
-        <ng-container *ngFor="let col of columns | async">
-          <app-cell [width]="col.width" [height]="row.height"></app-cell>
+        <ng-container *ngFor="let cell of row; index as j">
+          <app-cell 
+            [width]="cell.width" 
+            [height]="cell.height"
+            [border]="cell.border"
+            (mousedown)="onMouseDown($event, i, j)"
+            (mouseenter)="onMouseEnter($event, i, j)"
+            (mouseup)="onMouseUp($event, i, j)"
+          ></app-cell>
         </ng-container>
       </div>
     </ng-container>

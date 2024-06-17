@@ -43,9 +43,9 @@ export class GridService {
 
   private _generateGrid() {
     let newGrid: CellData[][] = [];
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 20; i++) { // originally 100
       newGrid.push([]);
-      for (let j = 0; j < 26; j++) {
+      for (let j = 0; j < 5; j++) { // originally 26
         newGrid[i].push(new CellData([i, j]));
       }
     }
@@ -64,6 +64,41 @@ export class GridService {
         this._rowLength = val.length;
       }
     })
+  }
+
+  public drawBorders(start: [number, number], end: [number, number]) {
+    const topLeft = [Math.min(start[0], end[0]), Math.min(start[1], end[1])];
+    const bottomRight = [Math.max(start[0], end[0]), Math.max(start[1], end[1])];
+    let col = topLeft[1]
+    let row = topLeft[0];
+    console.log('Top Left', topLeft);
+    console.log('Bottom Right', bottomRight)
+    let newGrid = [ ...this.grid ];
+
+    // Left to right across the top
+    for (; col <= bottomRight[1]; col++) {
+      newGrid[row][col].border.top = true;
+    }
+    col--;
+
+    // Down the right
+    for (; row <= bottomRight[0]; row++) {
+      newGrid[row][col].border.right = true;
+    }
+    row--;
+
+    // Right to left across the bottom
+    for (; col >= topLeft[1]; col--) {
+      newGrid[row][col].border.bottom = true;
+    }
+    col++;
+
+    // Up the left
+    for (; row >= topLeft[0]; row--) {
+      newGrid[row][col].border.left = true;
+    }
+
+    this.grid = newGrid;
   }
 
   public updateColumnWidth(index: number, width: number) {
@@ -87,7 +122,5 @@ export class GridService {
     newGrid[cellIndex[0]][cellIndex[1]].text = text;
     this.grid = newGrid;
   }
-
-
 
 }

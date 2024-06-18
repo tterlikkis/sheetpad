@@ -1,7 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { isRegistered, register, unregisterAll } from '@tauri-apps/api/globalShortcut';
 import { listen } from '@tauri-apps/api/event';
-import { writeText } from '@tauri-apps/api/clipboard';
+import { readText, writeText } from '@tauri-apps/api/clipboard';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +13,9 @@ export class TauriService {
 
   private readonly _ctrlXEvent: EventEmitter<void> = new EventEmitter();
   public readonly ctrlXEvent$ = this._ctrlXEvent.asObservable();
+
+  private readonly _ctrlVEvent: EventEmitter<void> = new EventEmitter();
+  public readonly ctrlVEvent$ = this._ctrlVEvent.asObservable();
 
   constructor() { 
     this._consumeWindowEvents();
@@ -27,17 +30,19 @@ export class TauriService {
     await writeText(text);
   }
 
+  public async getClipboardText() {
+    return (await readText()) || '';
+  }
+
   private async _registerCopy() {
     const str = 'CommandOrControl+C';
     const result = await isRegistered(str);
     if (result) {
-      console.log('Already registered to copy, quitting')
+      console.log('Already registered to copy, quitting');
       return;
     }
-    console.log('Registering copy')
-    await register(str, () => {
-      this._ctrlCEvent.emit();
-    });
+    console.log('Registering copy');
+    await register(str, () => this._ctrlCEvent.emit());
   }
 
   private async _registerCut() {
@@ -48,14 +53,24 @@ export class TauriService {
       return;
     }
     console.log('Registering cut');
-    await register(str, () => {
-      this._ctrlXEvent.emit();
-    });
+    await register(str, () => this._ctrlXEvent.emit());
+  }
+
+  private async _registerPaste() {
+    const str = 'CommandOrControl+V';
+    const result = await isRegistered(str);
+    if (result) {
+      console.log('Already registered to paste, quitting');
+      return;
+    }
+    console.log('Registering paste');
+    await register(str, () => this._ctrlVEvent.emit());
   }
 
   private _windowFocus() {
     this._registerCopy();
     this._registerCut();
+    this._registerPaste();
   }
 
   private async _windowFocusOut() {

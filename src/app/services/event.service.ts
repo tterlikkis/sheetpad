@@ -33,6 +33,11 @@ export class EventService {
   ) { 
     this._consumeCtrlCEvent();
     this._consumeCtrlXEvent();
+    this._consumeCtrlVEvent();
+  }
+
+  public test(index: Index, text: string) {
+    this.gridService.updateCellText(index, text);
   }
 
   private _consumeCtrlCEvent() {
@@ -44,7 +49,14 @@ export class EventService {
   private _consumeCtrlXEvent() {
     this.tauriService.ctrlXEvent$.subscribe(() => {
       this._copySelected(true);
-    })
+    });
+  }
+
+  private _consumeCtrlVEvent() {
+    this.tauriService.ctrlVEvent$.subscribe(async () => {
+      const text = await this.tauriService.getClipboardText();
+      this.gridService.pasteToGrid(this._dragStart, text)
+    });
   }
 
   private _copySelected(isCut: boolean = false) {

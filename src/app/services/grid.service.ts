@@ -95,6 +95,24 @@ export class GridService {
     for (const index of payload.rightList) newGrid[index.row][index.col].border.right = true;
   }
 
+  public pasteToGrid(start: Index, text: string) {
+    console.log('Starting paste')
+    const leftMostCol = start.col;
+    let row = start.row, col = start.col;
+    let newGrid = [ ...this.grid ];
+    for (const str of text.split('\n')) {
+      for (const subStr of str.split('\t')) {
+        newGrid[row][col].text = subStr;
+        col++;
+      }
+      col = leftMostCol;
+      row++;
+    }
+    console.log('Writing to grid')
+    this.grid = newGrid;
+    console.log('done')
+  }
+
   public updateColumnWidth(index: number, width: number) {
     let newGrid = [ ...this.grid ];
     for (let i = 0; i < this.rowLength; i++) {

@@ -36,10 +36,10 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
 
   constructor(
     private readonly eventService: EventService,
-    private readonly gridService: GridService
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
+    console.log('ngChanges')
     if (Object.keys(changes).some(key => key.includes('border'))) {
       this._setCellBorder();
     }
@@ -107,6 +107,6 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
 
   valueChange(event: any) {
     const newText = event.target.value;
-    this.gridService.updateCellText(this.index, newText);
+    this.eventService.test(this.index, newText);
   }
 }

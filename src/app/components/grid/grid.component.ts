@@ -17,7 +17,6 @@ export class GridComponent implements OnInit {
   constructor(
     private readonly gridService: GridService,
     private readonly eventService: EventService,
-    private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {

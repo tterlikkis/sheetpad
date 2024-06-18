@@ -3,7 +3,7 @@
   <ng-container *ngFor="let row of rows | async; index as i">
     <app-header 
       type="row" 
-      [content]="(row.index[0  ] + 1).toString()"
+      [content]="(row.index.row + 1).toString()"
       (onResize)="changeRowHeight(i, $event)"
     ></app-header>
   </ng-container>

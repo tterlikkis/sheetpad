@@ -3,7 +3,7 @@
   <ng-container *ngFor="let col of columns | async; index as i">
     <app-header 
       type="column" 
-      [content]="(col.index[1] | cellIndex).toString()"
+      [content]="(col.index.col | cellIndex).toString()"
       (onResize)="changeColumnWidth(i, $event)"
     ></app-header>
   </ng-container>

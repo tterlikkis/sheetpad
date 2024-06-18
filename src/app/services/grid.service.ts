@@ -1,6 +1,8 @@
 import { Injectable} from '@angular/core';
 import { BehaviorSubject, Subscription, map } from 'rxjs';
 import { CellData } from '../models/cell-data.class';
+import { Index } from '../models/index.class';
+import { BorderPayload } from '../models/border-payload.class';
 
 @Injectable({
   providedIn: 'root'
@@ -39,19 +41,37 @@ export class GridService {
   constructor() {
     this._generateGrid();
     this._consumeRowChanges();
+    this._consumeColumnChanges();
   }
 
   private _generateGrid() {
     let newGrid: CellData[][] = [];
-    for (let i = 0; i < 20; i++) { // originally 100
+    for (let i = 0; i < 5; i++) { // originally 100
       newGrid.push([]);
       for (let j = 0; j < 5; j++) { // originally 26
-        newGrid[i].push(new CellData([i, j]));
+        newGrid[i].push(new CellData(i, j));
       }
     }
     this._grid.next(newGrid);
   }
 
+  public async clearBorders(indexes: Index[]) {
+    let newGrid = [ ...this.grid ];
+    for (const index of indexes) {
+      newGrid[index.row][index.col].border = {
+        top: false, bottom: false, left: false, right: false
+      }
+    }
+    this.grid = newGrid;
+  }
+
+  private _consumeColumnChanges() {
+    this.columns$.subscribe(val => {
+      if (val.length !== this._colLength) {
+        this._colLength = val.length;
+      }
+    })
+  }
 
   private _consumeRowChanges() {
     this.rows$.subscribe(val => {
@@ -66,39 +86,13 @@ export class GridService {
     })
   }
 
-  public drawBorders(start: [number, number], end: [number, number]) {
-    const topLeft = [Math.min(start[0], end[0]), Math.min(start[1], end[1])];
-    const bottomRight = [Math.max(start[0], end[0]), Math.max(start[1], end[1])];
-    let col = topLeft[1]
-    let row = topLeft[0];
-    console.log('Top Left', topLeft);
-    console.log('Bottom Right', bottomRight)
+  public async drawBorders(payload: BorderPayload) {
+    await this.clearBorders(payload.toList());
     let newGrid = [ ...this.grid ];
-
-    // Left to right across the top
-    for (; col <= bottomRight[1]; col++) {
-      newGrid[row][col].border.top = true;
-    }
-    col--;
-
-    // Down the right
-    for (; row <= bottomRight[0]; row++) {
-      newGrid[row][col].border.right = true;
-    }
-    row--;
-
-    // Right to left across the bottom
-    for (; col >= topLeft[1]; col--) {
-      newGrid[row][col].border.bottom = true;
-    }
-    col++;
-
-    // Up the left
-    for (; row >= topLeft[0]; row--) {
-      newGrid[row][col].border.left = true;
-    }
-
-    this.grid = newGrid;
+    for (const index of payload.topList) newGrid[index.row][index.col].border.top = true;
+    for (const index of payload.bottomList) newGrid[index.row][index.col].border.bottom = true;
+    for (const index of payload.leftList) newGrid[index.row][index.col].border.left = true;
+    for (const index of payload.rightList) newGrid[index.row][index.col].border.right = true;
   }
 
   public updateColumnWidth(index: number, width: number) {
@@ -117,9 +111,9 @@ export class GridService {
     this.grid = newGrid;
   }
 
-  public updateCell(cellIndex: [number, number], text: string) {
+  public updateCell(cellIndex: Index, text: string) {
     let newGrid = [ ...this.grid ];
-    newGrid[cellIndex[0]][cellIndex[1]].text = text;
+    newGrid[cellIndex.row][cellIndex.col].text = text;
     this.grid = newGrid;
   }
 

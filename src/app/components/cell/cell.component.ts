@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, HostBinding, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { Border } from 'src/app/models/border.interface';
+import { CellData } from 'src/app/models/cell-data.class';
 
 @Component({
   selector: 'app-cell',
@@ -9,21 +10,24 @@ import { Border } from 'src/app/models/border.interface';
 export class CellComponent implements OnChanges, AfterViewInit {
 
   @ViewChild("input") input?: ElementRef;
-  @ViewChild("cell") cell?: ElementRef;
+  @ViewChild("cell") cellRef?: ElementRef;
 
   @Input() width: number = 80;
   @Input() height: number = 20;
-  @Input() border!: Border;
+  border!: Border;
+
+  // I have to break it up into seperate booleans so that changes
+  // are detected by ngChanges
+  @Input() borderTop = false;
+  @Input() borderBottom = false;
+  @Input() borderLeft = false;
+  @Input() borderRight = false;
 
   showInput: boolean = false;
   value: string = "";
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('ngChanges')
-    if ("border" in changes) {
-      this.border = changes["border"].currentValue;
-      this._setCellBorder();
-    }
+    this._setCellBorder();
     if ("width" in changes) {
       this.width = changes["width"].currentValue;
       this._setCellWidth();
@@ -50,23 +54,23 @@ export class CellComponent implements OnChanges, AfterViewInit {
   }
 
   private _setCellBorder() {
-    if (!this.cell) return;
+    if (!this.cellRef) return;
     const val = (b: boolean) => b ? 'solid' : 'none';
-    this.cell.nativeElement.style.setProperty('--cell-border-top', val(this.border.top));
-    this.cell.nativeElement.style.setProperty('--cell-border-bottom', val(this.border.bottom));
-    this.cell.nativeElement.style.setProperty('--cell-border-left', val(this.border.left));
-    this.cell.nativeElement.style.setProperty('--cell-border-right', val(this.border.right));
+    this.cellRef.nativeElement.style.setProperty('--cell-border-top', val(this.borderTop));
+    this.cellRef.nativeElement.style.setProperty('--cell-border-bottom', val(this.borderBottom));
+    this.cellRef.nativeElement.style.setProperty('--cell-border-left', val(this.borderLeft));
+    this.cellRef.nativeElement.style.setProperty('--cell-border-right', val(this.borderRight));
   }
 
   private _setCellWidth() {
-    if (!this.cell) return;
+    if (!this.cellRef) return;
     const str = `${this.width}px`
-    this.cell.nativeElement.style.setProperty('--cell-width', str);
+    this.cellRef.nativeElement.style.setProperty('--cell-width', str);
   }
 
   private _setCellHeight() {
-    if (!this.cell) return;
+    if (!this.cellRef) return;
     const str = `${this.height}px`
-    this.cell.nativeElement.style.setProperty('--cell-height', str);
+    this.cellRef.nativeElement.style.setProperty('--cell-height', str);
   }
 }

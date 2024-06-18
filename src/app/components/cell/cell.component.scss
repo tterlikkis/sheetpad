@@ -7,6 +7,8 @@
   --cell-border-left: solid;
   --cell-border-right: solid;
 
+  --cell-brightness: 100%;
+
   width: var(--cell-width);
   max-width: var(--cell-width);
   min-width: var(--cell-width);
@@ -16,6 +18,8 @@
 
   position: relative;
   border-color: #aaaaaa;
+
+  filter: brightness(var(--cell-brightness));
 
   &::before {
     content: "";

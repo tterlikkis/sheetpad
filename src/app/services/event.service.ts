@@ -1,7 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { GridService } from './grid.service';
 import { Index } from '../models/index.class';
-import { BorderPayload } from '../models/border-payload.class';
+import { StylePayload } from '../models/style-payload.class';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -17,7 +17,7 @@ export class EventService {
     this._isDragging = v;
   }
 
-  private _payload: BorderPayload = new BorderPayload();
+  private _payload: StylePayload = new StylePayload();
   
   private readonly _dragStart: Index = new Index();
   private readonly _dragEnd: Index = new Index();
@@ -57,7 +57,7 @@ export class EventService {
     );
     let col = topLeft.col
     let row = topLeft.row;
-    this._payload = new BorderPayload(this._dragStart);
+    this._payload = new StylePayload(this._dragStart);
 
     // Left to right across the top
     for (; col <= bottomRight.col; col++) this._payload.topList.push(new Index(row, col));
@@ -76,9 +76,9 @@ export class EventService {
   }
 
   private async _draw() {
-    await this.gridService.clearBorders(this._payload.toList());
+    await this.gridService.clearStyle(this._payload);
     this.calcBorders();
-    await this.gridService.drawBorders(this._payload);
+    await this.gridService.draw(this._payload);
   }
 
 }

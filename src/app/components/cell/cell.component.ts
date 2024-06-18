@@ -15,16 +15,17 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
   @ViewChild("input") input?: ElementRef;
   @ViewChild("cell") cellRef?: ElementRef;
 
+  // I have to break it up into seperate properties so that changes are detected >:/
   @Input() index: Index = new Index();
   @Input() width: number = 80;
   @Input() height: number = 20;
 
-  // I have to break it up into seperate booleans so that changes
-  // are detected by ngChanges
-  @Input() borderTop = false;
-  @Input() borderBottom = false;
-  @Input() borderLeft = false;
-  @Input() borderRight = false;
+  @Input() borderTop: boolean = false;
+  @Input() borderBottom: boolean = false;
+  @Input() borderLeft: boolean = false;
+  @Input() borderRight: boolean = false;
+
+  @Input() selected: boolean = false
 
   showInput: boolean = false;
   value: string = "";
@@ -42,6 +43,9 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
     }
     if ("height" in changes) {
       this._setCellHeight();
+    }
+    if ("selected" in changes) {
+      this._setSelected();
     }
   }
 
@@ -88,5 +92,11 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
     if (!this.cellRef) return;
     const str = `${this.height}px`
     this.cellRef.nativeElement.style.setProperty('--cell-height', str);
+  }
+
+  private _setSelected() {
+    if (!this.cellRef) return;
+    const str = this.selected ? '85%' : '100%';
+    this.cellRef.nativeElement.style.setProperty('--cell-brightness', str);
   }
 }

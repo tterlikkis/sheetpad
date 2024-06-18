@@ -2,7 +2,7 @@ import { Injectable} from '@angular/core';
 import { BehaviorSubject, Subscription, map } from 'rxjs';
 import { CellData } from '../models/cell-data.class';
 import { Index } from '../models/index.class';
-import { BorderPayload } from '../models/border-payload.class';
+import { StylePayload } from '../models/style-payload.class';
 
 @Injectable({
   providedIn: 'root'
@@ -55,9 +55,9 @@ export class GridService {
     this._grid.next(newGrid);
   }
 
-  public async clearBorders(indexes: Index[]) {
+  public async clearStyle(payload: StylePayload) {
     let newGrid = [ ...this.grid ];
-    for (const index of indexes) {
+    for (const index of payload.borderList()) {
       newGrid[index.row][index.col].border = {
         top: false, bottom: false, left: false, right: false
       }
@@ -86,8 +86,8 @@ export class GridService {
     })
   }
 
-  public async drawBorders(payload: BorderPayload) {
-    await this.clearBorders(payload.toList());
+  public async draw(payload: StylePayload) {
+    await this.clearStyle(payload);
     let newGrid = [ ...this.grid ];
     for (const index of payload.topList) newGrid[index.row][index.col].border.top = true;
     for (const index of payload.bottomList) newGrid[index.row][index.col].border.bottom = true;

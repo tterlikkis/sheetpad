@@ -6,6 +6,7 @@
       <div class="row">
         <ng-container *ngFor="let cell of row; index as j">
           <app-cell 
+            [index]="cell.index"
             [width]="cell.width"
             [height]="cell.height"
             [borderTop]="cell.border.top"
@@ -13,8 +14,8 @@
             [borderLeft]="cell.border.left"
             [borderRight]="cell.border.right"
             (mousedown)="onMouseDown($event, i, j)"
-            (mouseenter)="onMouseEnter($event, i, j)"
-            (mouseup)="onMouseUp($event, i, j)"
+            (mouseenter)="onMouseEnter(i, j)"
+            (mouseup)="onMouseUp()"
           ></app-cell>
         </ng-container>
       </div>

@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { GridService } from './grid.service';
 import { Index } from '../models/index.class';
 import { BorderPayload } from '../models/border-payload.class';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -18,13 +19,19 @@ export class EventService {
 
   private _payload: BorderPayload = new BorderPayload();
   
-  private _dragStart: Index = new Index();
-  private _dragEnd: Index = new Index();
+  private readonly _dragStart: Index = new Index();
+  private readonly _dragEnd: Index = new Index();
+
+  private readonly _dragEndEvent: EventEmitter<Index> = new EventEmitter<Index>();
+  public readonly dragEndEvent$: Observable<Index> = this._dragEndEvent.asObservable();
+
+
   constructor(private readonly gridService: GridService) { }
 
   public async dragStart(row: number, col: number) {
     this.isDragging = true;
     this._dragStart.set(row, col);
+    this._payload.start = this._dragStart;
     this._dragEnd.set(row, col);
     this._draw();
   }
@@ -34,8 +41,9 @@ export class EventService {
     this._draw(); 
   } 
 
-  public dragEnd(row: number, col: number) {
+  public dragEnd() {
     this.isDragging = false;
+    this._dragEndEvent.next(this._dragStart);
   }
 
   private calcBorders() {
@@ -49,7 +57,7 @@ export class EventService {
     );
     let col = topLeft.col
     let row = topLeft.row;
-    this._payload = new BorderPayload();
+    this._payload = new BorderPayload(this._dragStart);
 
     // Left to right across the top
     for (; col <= bottomRight.col; col++) this._payload.topList.push(new Index(row, col));

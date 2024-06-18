@@ -29,13 +29,13 @@ export class GridComponent implements OnInit {
     this.eventService.dragStart(row, col);
   }
 
-  onMouseEnter(event: MouseEvent, row: number, col: number) {
+  onMouseEnter(row: number, col: number) {
     if (!this.eventService.isDragging) return;
     this.eventService.dragMove(row, col);
   }
 
-  onMouseUp(event: MouseEvent, row: number, col: number) {
-    this.eventService.dragEnd(row, col);
+  onMouseUp() {
+    this.eventService.dragEnd();
   }
 
   // generateGrid() {

@@ -6,7 +6,11 @@ export class BorderPayload {
   leftList:   Index[] = [];
   rightList:  Index[] = [];
 
-  constructor() {}
+  start: Index;
+
+  constructor(start?: Index) {
+    this.start = start || new Index();
+  }
 
   toList() {
     return [ 

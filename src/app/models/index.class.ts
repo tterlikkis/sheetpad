@@ -16,4 +16,9 @@ export class Index {
     this.row = row;
     this.col = col;
   }
+
+  public static compare(a: Index, b: Index): boolean {
+    return a.row === b.row && a.col === b.col;
+  }
+
 }

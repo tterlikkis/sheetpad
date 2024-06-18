@@ -111,9 +111,17 @@ export class GridService {
     this.grid = newGrid;
   }
 
-  public updateCell(cellIndex: Index, text: string) {
+  public updateCellText(cellIndexes: Index | Index[], text: string) {
     let newGrid = [ ...this.grid ];
-    newGrid[cellIndex.row][cellIndex.col].text = text;
+    if (Array.isArray(cellIndexes)) {
+      console.log('is array')
+      for (const index of cellIndexes) {
+        newGrid[index.row][index.col].text = text;
+      }
+    }
+    else {
+      newGrid[cellIndexes.row][cellIndexes.col].text = text;
+    }
     this.grid = newGrid;
   }
 

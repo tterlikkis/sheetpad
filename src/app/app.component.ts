@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { TauriService } from './services/tauri.service';
 
 @Component({
   selector: 'app-root',
@@ -7,6 +8,8 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'sheetpad';
+
+  constructor(private readonly tauriService: TauriService) {}
 
   public numberToString(index: number): string {
     if (index < 26) return String.fromCharCode(index + 65);

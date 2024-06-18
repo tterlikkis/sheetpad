@@ -7,6 +7,7 @@
         <ng-container *ngFor="let cell of row; index as j">
           <app-cell 
             [index]="cell.index"
+            [value]="cell.text"
             [width]="cell.width"
             [height]="cell.height"
             [borderTop]="cell.border.top"

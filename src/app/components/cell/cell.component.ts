@@ -4,6 +4,7 @@ import { Border } from 'src/app/models/border.interface';
 import { CellData } from 'src/app/models/cell-data.class';
 import { Index } from 'src/app/models/index.class';
 import { EventService } from 'src/app/services/event.service';
+import { GridService } from 'src/app/services/grid.service';
 
 @Component({
   selector: 'app-cell',
@@ -17,6 +18,8 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
 
   // I have to break it up into seperate properties so that changes are detected >:/
   @Input() index: Index = new Index();
+  @Input() value: string = "";
+
   @Input() width: number = 80;
   @Input() height: number = 20;
 
@@ -28,11 +31,13 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
   @Input() selected: boolean = false
 
   showInput: boolean = false;
-  value: string = "";
-
+  
   private _sub?: Subscription;
 
-  constructor(private readonly eventService: EventService) {}
+  constructor(
+    private readonly eventService: EventService,
+    private readonly gridService: GridService
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (Object.keys(changes).some(key => key.includes('border'))) {
@@ -98,5 +103,10 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
     if (!this.cellRef) return;
     const str = this.selected ? '85%' : '100%';
     this.cellRef.nativeElement.style.setProperty('--cell-brightness', str);
+  }
+
+  valueChange(event: any) {
+    const newText = event.target.value;
+    this.gridService.updateCellText(this.index, newText);
   }
 }

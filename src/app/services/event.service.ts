@@ -3,6 +3,7 @@ import { GridService } from './grid.service';
 import { Index } from '../models/index.class';
 import { StylePayload } from '../models/style-payload.class';
 import { Observable } from 'rxjs';
+import { TauriService } from './tauri.service';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +27,48 @@ export class EventService {
   public readonly dragEndEvent$: Observable<Index> = this._dragEndEvent.asObservable();
 
 
-  constructor(private readonly gridService: GridService) { }
+  constructor(
+    private readonly gridService: GridService,
+    private readonly tauriService: TauriService
+  ) { 
+    this._consumeCtrlCEvent();
+    this._consumeCtrlXEvent();
+  }
+
+  private _consumeCtrlCEvent() {
+    this.tauriService.ctrlCEvent$.subscribe(() => {
+      this._copySelected();
+    });
+  }
+
+  private _consumeCtrlXEvent() {
+    this.tauriService.ctrlXEvent$.subscribe(() => {
+      this._copySelected(true);
+    })
+  }
+
+  private _copySelected(isCut: boolean = false) {
+    let copyText = "";
+    const list = this._payload.wholeList();
+    if (list.length === 0) return;
+    let currentRow = list[0].row
+    for (let i = 0; i < list.length; i++) {
+      const index = list[i];
+      if (currentRow !== index.row) {
+        copyText += '\n';
+      }
+      console.log(index)
+      console.log(this.gridService.grid[index.row][index.col])
+      copyText += this.gridService.grid[index.row][index.col].text 
+      if (i !== list.length - 1) {
+        copyText += '\t';
+      }
+      currentRow = index.row;
+    }
+    console.log(copyText)
+    this.tauriService.copyToClipboard(copyText);
+    if (isCut) this.gridService.updateCellText(list, '');
+  }
 
   public async dragStart(row: number, col: number) {
     this.isDragging = true;

@@ -22,9 +22,13 @@ export class StylePayload {
     ];
   }
 
-  darkList() {
-    if (Math.min(this.topList.length, this.leftList.length) === 0) return [];
-    const row = this.leftList[0].row, col = this.topList[0].col;
+  listWithoutStart() {
+    return this.wholeList().filter(i => !Index.compare(i, this.start));
+  }
+
+  wholeList() {
+    if (Math.max(this.topList.length, this.leftList.length) < 2) return [];
+    const row = this.topList[0].row, col = this.topList[0].col;
     let result: Index[] = [];
 
     for (let i = row; i < row + this.leftList.length; i++) {
@@ -33,6 +37,6 @@ export class StylePayload {
       }
     }
 
-    return result.filter(i => !Index.compare(i, this.start));
+    return result
   }
 }

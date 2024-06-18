@@ -7,5 +7,7 @@
     [hidden]="!showInput" 
     [(ngModel)]="value" 
     (focusout)="focusOut()"
+    [value]="value"
+    (change)="valueChange($event)"
   >
 </div>

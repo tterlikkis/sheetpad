@@ -1,13 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
 :root {
   --y-axis-width: 28px;
-  --header-bg: rgba(0, 0, 0, 0.2); // originally #bbbbbb
+  --header-bg: #cccccc; // originally #bbbbbb
   --header-border: #4f4f4f;
   --my-red: #ff0000;
 }
 
 body {
   margin: 0px;
+  font-family: 'Helvetica', Arial, Lucida Grande, sans-serif !important;
 }
 
 .g-spacer {

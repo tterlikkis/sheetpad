@@ -22,6 +22,7 @@ export class TauriService {
   }
 
   private async _consumeWindowEvents() {
+    await listen('tauri://window-created', (event) => this._windowFocus());
     await listen('tauri://focus', (event) => this._windowFocus());
     await listen('tauri://blur', (event) => this._windowFocusOut());
   }

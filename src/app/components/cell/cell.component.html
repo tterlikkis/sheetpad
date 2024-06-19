@@ -5,9 +5,8 @@
     class="edit-box" 
     [size]="value.length | cellInputWidth"
     [hidden]="!showInput" 
-    [(ngModel)]="value" 
     (focusout)="focusOut()"
-    [value]="value"
-    (change)="valueChange($event)"
+    [ngModel]="value"
+    (ngModelChange)="valueChange($event)"
   >
 </div>

@@ -88,25 +88,19 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
   }
 
   private _setCellWidth() {
-    if (!this.cellRef) return;
-    const str = `${this.width}px`
-    this.cellRef.nativeElement.style.setProperty('--cell-width', str);
+    this.cellRef?.nativeElement.style.setProperty('--cell-width', `${this.width}px`);
   }
 
   private _setCellHeight() {
-    if (!this.cellRef) return;
-    const str = `${this.height}px`
-    this.cellRef.nativeElement.style.setProperty('--cell-height', str);
+    this.cellRef?.nativeElement.style.setProperty('--cell-height', `${this.height}px`);
   }
 
   private _setSelected() {
-    if (!this.cellRef) return;
-    const str = this.selected ? '85%' : '100%';
-    this.cellRef.nativeElement.style.setProperty('--cell-brightness', str);
+    console.log('setting brightness')
+    this.cellRef?.nativeElement.style.setProperty('--cell-color', this.selected ? 'rgb(0, 0, 0, 0.1)' : 'transparent');
   }
 
   valueChange(event: any) {
-    const newText = event.target.value;
-    this.eventService.test(this.index, newText);
+    this.eventService.test(this.index, event);
   }
 }

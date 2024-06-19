@@ -1,4 +1,5 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { RowColumn } from 'src/app/models/row-column.class';
 import { EventService } from 'src/app/services/event.service';
 import { GridService } from 'src/app/services/grid.service';
@@ -8,18 +9,32 @@ import { GridService } from 'src/app/services/grid.service';
   templateUrl: './grid.component.html',
   styleUrls: ['./grid.component.scss']
 })
-export class GridComponent implements OnInit {
+export class GridComponent implements OnInit, OnDestroy {
   rows = this.gridService.rows$;
   columns = this.gridService.columns$;
 
   grid = this.gridService.grid$;
 
+  private _sub?: Subscription;
+
   constructor(
     private readonly gridService: GridService,
     private readonly eventService: EventService,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    this._consumePasteEvent();
+  }
+
+  ngOnDestroy(): void {
+    this._sub?.unsubscribe();
+  }
+
+  private _consumePasteEvent() {
+    this._sub = this.gridService.pasteEvent$.subscribe(val => {
+      this.cdr.detectChanges();
+    })
   }
 
   onMouseDown(event: MouseEvent, row: number, col: number) {

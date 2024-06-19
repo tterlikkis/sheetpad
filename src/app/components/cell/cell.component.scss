@@ -8,6 +8,7 @@
   --cell-border-right: solid;
 
   --cell-brightness: 100%;
+  --cell-color: transparent;
 
   width: var(--cell-width);
   max-width: var(--cell-width);
@@ -19,12 +20,12 @@
   position: relative;
   border-color: #aaaaaa;
 
-  filter: brightness(var(--cell-brightness));
+  background-color: var(--cell-color);
 
   &::before {
     content: "";
     position: absolute;
-    border-color: darkgreen;
+    border-color: rgb(0, 64, 164); //#011f79;
     border-width: 2px;
     border-top-style: var(--cell-border-top);
     border-bottom-style: var(--cell-border-bottom);
@@ -43,6 +44,7 @@
   height: 100%;
   overflow: hidden;
   position: relative;
+  text-wrap: nowrap;
 
   &:hover {
     cursor: text;

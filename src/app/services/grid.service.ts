@@ -1,4 +1,4 @@
-import { Injectable} from '@angular/core';
+import { EventEmitter, Injectable} from '@angular/core';
 import { BehaviorSubject, Subscription, map } from 'rxjs';
 import { CellData } from '../models/cell-data.class';
 import { Index } from '../models/index.class';
@@ -38,6 +38,9 @@ export class GridService {
     this._colLength = v;
   }
 
+  private readonly _pasteEvent = new EventEmitter<void>();
+  public readonly pasteEvent$ = this._pasteEvent.asObservable();
+
   constructor() {
     this._generateGrid();
     this._consumeRowChanges();
@@ -60,7 +63,8 @@ export class GridService {
     for (const index of payload.borderList()) {
       newGrid[index.row][index.col].border = {
         top: false, bottom: false, left: false, right: false
-      }
+      };
+      newGrid[index.row][index.col].selected = false;
     }
     this.grid = newGrid;
   }
@@ -86,17 +90,19 @@ export class GridService {
     })
   }
 
-  public async draw(payload: StylePayload) {
+  public async draw(payload: StylePayload, darkenSelected: boolean = false) {
     await this.clearStyle(payload);
     let newGrid = [ ...this.grid ];
     for (const index of payload.topList) newGrid[index.row][index.col].border.top = true;
     for (const index of payload.bottomList) newGrid[index.row][index.col].border.bottom = true;
     for (const index of payload.leftList) newGrid[index.row][index.col].border.left = true;
     for (const index of payload.rightList) newGrid[index.row][index.col].border.right = true;
+    if (darkenSelected)
+      for (const index of payload.listWithoutStart()) newGrid[index.row][index.col].selected = true;
+    this.grid = newGrid;
   }
 
   public pasteToGrid(start: Index, text: string) {
-    console.log('Starting paste')
     const leftMostCol = start.col;
     let row = start.row, col = start.col;
     let newGrid = [ ...this.grid ];
@@ -108,9 +114,8 @@ export class GridService {
       col = leftMostCol;
       row++;
     }
-    console.log('Writing to grid')
     this.grid = newGrid;
-    console.log('done')
+    this._pasteEvent.emit();
   }
 
   public updateColumnWidth(index: number, width: number) {

@@ -97,6 +97,7 @@ export class EventService {
 
   public dragEnd() {
     this.isDragging = false;
+    this._draw(true)
     this._dragEndEvent.next(this._dragStart);
   }
 
@@ -129,10 +130,10 @@ export class EventService {
     for (; row >= topLeft.row; row--) this._payload.leftList.push(new Index(row, col));
   }
 
-  private async _draw() {
+  private async _draw(dragEnd: boolean = false) {
     await this.gridService.clearStyle(this._payload);
     this.calcBorders();
-    await this.gridService.draw(this._payload);
+    await this.gridService.draw(this._payload, dragEnd);
   }
 
 }

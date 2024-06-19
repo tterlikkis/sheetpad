@@ -2,7 +2,7 @@ import { EventEmitter, Injectable} from '@angular/core';
 import { BehaviorSubject, Subscription, map } from 'rxjs';
 import { CellData } from '../models/cell-data.class';
 import { Index } from '../models/index.class';
-import { StylePayload } from '../models/style-payload.class';
+import { StylePayload as SelectionPayload } from '../models/selection-payload.class';
 
 @Injectable({
   providedIn: 'root'
@@ -38,8 +38,12 @@ export class GridService {
     this._colLength = v;
   }
 
-  private readonly _pasteEvent = new EventEmitter<void>();
-  public readonly pasteEvent$ = this._pasteEvent.asObservable();
+  // Have to send event to grid component to cdr.detectChanges()
+  // because for some reason changing cell text doesn't actually
+  // trigger Angular change detection until you wiggle the mouse
+  // or switch focus to a new window.
+  private readonly _refreshEvent = new EventEmitter<void>();
+  public readonly refreshEvent = this._refreshEvent.asObservable();
 
   constructor() {
     this._generateGrid();
@@ -51,14 +55,23 @@ export class GridService {
     let newGrid: CellData[][] = [];
     for (let i = 0; i < 35; i++) { // originally 100
       newGrid.push([]);
-      for (let j = 0; j < 17; j++) { // originally 26
+      for (let j = 0; j < 26; j++) { // originally 26
         newGrid[i].push(new CellData(i, j));
       }
     }
     this._grid.next(newGrid);
   }
 
-  public async clearStyle(payload: StylePayload, dragEnd: boolean = false) {
+  public clearGridSelection(payload: SelectionPayload) {
+    let newGrid = [ ...this.grid ];
+    for (const index of payload.wholeList()) {
+      newGrid[index.row][index.col].text = "";
+    }
+    this.grid = newGrid;
+    this._refreshEvent.emit();
+  }
+
+  public async clearStyle(payload: SelectionPayload, dragEnd: boolean = false) {
     let newGrid = [ ...this.grid ];
     for (const index of payload.borderList()) {
       newGrid[index.row][index.col].border = {
@@ -94,7 +107,7 @@ export class GridService {
     })
   }
 
-  public async draw(payload: StylePayload, dragEnd: boolean = false) {
+  public async draw(payload: SelectionPayload, dragEnd: boolean = false) {
     // await this.clearStyle(payload, dragEnd);
     let newGrid = [ ...this.grid ];
     for (const index of payload.topList) newGrid[index.row][index.col].border.top = true;
@@ -119,7 +132,7 @@ export class GridService {
       row++;
     }
     this.grid = newGrid;
-    this._pasteEvent.emit();
+    this._refreshEvent.emit();
   }
 
   public updateColumnWidth(index: number, width: number) {

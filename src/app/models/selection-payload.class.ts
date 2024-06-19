@@ -27,7 +27,10 @@ export class StylePayload {
   }
 
   wholeList() {
-    if (Math.max(this.topList.length, this.leftList.length) < 2) return [];
+    const max = Math.max(this.topList.length, this.leftList.length)
+    if (max < 1) return [];
+    else if (max < 2) return [ this.start ];
+    
     const row = this.topList[0].row, col = this.topList[0].col;
     let result: Index[] = [];
 

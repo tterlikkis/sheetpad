@@ -1,5 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { isRegistered, register, unregisterAll } from '@tauri-apps/api/globalShortcut';
+import { isRegistered, register, unregister, unregisterAll } from '@tauri-apps/api/globalShortcut';
 import { listen } from '@tauri-apps/api/event';
 import { readText, writeText } from '@tauri-apps/api/clipboard';
 
@@ -16,6 +16,9 @@ export class TauriService {
 
   private readonly _ctrlVEvent: EventEmitter<void> = new EventEmitter();
   public readonly ctrlVEvent$ = this._ctrlVEvent.asObservable();
+
+  private readonly _delEvent: EventEmitter<void> = new EventEmitter();
+  public readonly delEvent$ = this._delEvent.asObservable();
 
   constructor() { 
     this._consumeWindowEvents();
@@ -57,6 +60,17 @@ export class TauriService {
     await register(str, () => this._ctrlXEvent.emit());
   }
 
+  public async registerDelete() {
+    const str = 'Delete';
+    const result = await isRegistered(str);
+    if (result) {
+      console.log('Already registered to delete, quitting');
+      return;
+    }
+    console.log('Registering delete');
+    await register(str, () => this._delEvent.emit());
+  }
+
   private async _registerPaste() {
     const str = 'CommandOrControl+V';
     const result = await isRegistered(str);
@@ -66,6 +80,10 @@ export class TauriService {
     }
     console.log('Registering paste');
     await register(str, () => this._ctrlVEvent.emit());
+  }
+
+  public async unRegisterDelete() {
+    await unregister('Delete');
   }
 
   private _windowFocus() {

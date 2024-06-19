@@ -24,17 +24,17 @@ export class GridComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this._consumePasteEvent();
+    this._consumeRefreshEvent();
   }
 
   ngOnDestroy(): void {
     this._sub?.unsubscribe();
   }
 
-  private _consumePasteEvent() {
-    this._sub = this.gridService.pasteEvent$.subscribe(val => {
+  private _consumeRefreshEvent() {
+    this._sub = this.gridService.refreshEvent.subscribe(() => {
       this.cdr.detectChanges();
-    })
+    });
   }
 
   onMouseDown(event: MouseEvent, row: number, col: number) {

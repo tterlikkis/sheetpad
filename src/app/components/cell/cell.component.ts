@@ -39,7 +39,6 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('ngChanges')
     if (Object.keys(changes).some(key => key.includes('border'))) {
       this._setCellBorder();
     }
@@ -96,7 +95,6 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
   }
 
   private _setSelected() {
-    console.log('setting brightness')
     this.cellRef?.nativeElement.style.setProperty('--cell-color', this.selected ? 'rgb(0, 0, 0, 0.1)' : 'transparent');
   }
 

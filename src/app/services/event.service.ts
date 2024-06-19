@@ -1,7 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { GridService } from './grid.service';
 import { Index } from '../models/index.class';
-import { StylePayload } from '../models/style-payload.class';
+import { StylePayload } from '../models/selection-payload.class';
 import { Observable } from 'rxjs';
 import { TauriService } from './tauri.service';
 
@@ -17,6 +17,16 @@ export class EventService {
   private set isDragging(v : boolean) {
     this._isDragging = v;
   }
+
+  
+  private _isSelected : boolean = false;
+  public get isSelected() : boolean {
+    return this._isSelected;
+  }
+  private set isSelected(v : boolean) {
+    this._isSelected = v;
+  }
+  
 
   private _payload: StylePayload = new StylePayload();
   
@@ -34,6 +44,7 @@ export class EventService {
     this._consumeCtrlCEvent();
     this._consumeCtrlXEvent();
     this._consumeCtrlVEvent();
+    this._consumeDeleteEvent();
   }
 
   public test(index: Index, text: string) {
@@ -56,6 +67,12 @@ export class EventService {
     this.tauriService.ctrlVEvent$.subscribe(async () => {
       const text = await this.tauriService.getClipboardText();
       this.gridService.pasteToGrid(this._dragStart, text)
+    });
+  }
+
+  private _consumeDeleteEvent() {
+    this.tauriService.delEvent$.subscribe(() => {
+      this.gridService.clearGridSelection(this._payload);
     });
   }
 
@@ -84,10 +101,12 @@ export class EventService {
 
   public async dragStart(row: number, col: number) {
     this.isDragging = true;
+    this.isSelected = false;
     this._dragStart.set(row, col);
     this._payload.start = this._dragStart;
     this._dragEnd.set(row, col);
     this._draw(true);
+    this.tauriService.unRegisterDelete();
   }
 
   public dragMove(row: number, col: number) {
@@ -96,8 +115,10 @@ export class EventService {
   } 
 
   public dragEnd() {
+    this.isSelected = true;
     this.isDragging = false;
-    this._draw(false, true)
+    this._draw(false, true);
+    this.tauriService.registerDelete();
     this._dragEndEvent.next(this._dragStart);
   }
 

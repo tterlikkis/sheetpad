@@ -87,7 +87,7 @@ export class EventService {
     this._dragStart.set(row, col);
     this._payload.start = this._dragStart;
     this._dragEnd.set(row, col);
-    this._draw();
+    this._draw(true);
   }
 
   public dragMove(row: number, col: number) {
@@ -97,7 +97,7 @@ export class EventService {
 
   public dragEnd() {
     this.isDragging = false;
-    this._draw(true)
+    this._draw(false, true)
     this._dragEndEvent.next(this._dragStart);
   }
 
@@ -130,8 +130,8 @@ export class EventService {
     for (; row >= topLeft.row; row--) this._payload.leftList.push(new Index(row, col));
   }
 
-  private async _draw(dragEnd: boolean = false) {
-    await this.gridService.clearStyle(this._payload);
+  private async _draw(dragStart: boolean = false, dragEnd: boolean = false) {
+    await this.gridService.clearStyle(this._payload, dragStart);
     this.calcBorders();
     await this.gridService.draw(this._payload, dragEnd);
   }

@@ -49,22 +49,26 @@ export class GridService {
 
   private _generateGrid() {
     let newGrid: CellData[][] = [];
-    for (let i = 0; i < 5; i++) { // originally 100
+    for (let i = 0; i < 35; i++) { // originally 100
       newGrid.push([]);
-      for (let j = 0; j < 5; j++) { // originally 26
+      for (let j = 0; j < 17; j++) { // originally 26
         newGrid[i].push(new CellData(i, j));
       }
     }
     this._grid.next(newGrid);
   }
 
-  public async clearStyle(payload: StylePayload) {
+  public async clearStyle(payload: StylePayload, dragEnd: boolean = false) {
     let newGrid = [ ...this.grid ];
     for (const index of payload.borderList()) {
       newGrid[index.row][index.col].border = {
         top: false, bottom: false, left: false, right: false
       };
-      newGrid[index.row][index.col].selected = false;
+    }
+    if (dragEnd) {
+      for (const index of payload.listWithoutStart()) {
+        newGrid[index.row][index.col].selected = false;
+      }
     }
     this.grid = newGrid;
   }
@@ -90,14 +94,14 @@ export class GridService {
     })
   }
 
-  public async draw(payload: StylePayload, darkenSelected: boolean = false) {
-    await this.clearStyle(payload);
+  public async draw(payload: StylePayload, dragEnd: boolean = false) {
+    // await this.clearStyle(payload, dragEnd);
     let newGrid = [ ...this.grid ];
     for (const index of payload.topList) newGrid[index.row][index.col].border.top = true;
     for (const index of payload.bottomList) newGrid[index.row][index.col].border.bottom = true;
     for (const index of payload.leftList) newGrid[index.row][index.col].border.left = true;
     for (const index of payload.rightList) newGrid[index.row][index.col].border.right = true;
-    if (darkenSelected)
+    if (dragEnd)
       for (const index of payload.listWithoutStart()) newGrid[index.row][index.col].selected = true;
     this.grid = newGrid;
   }

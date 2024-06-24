@@ -105,6 +105,7 @@ export class EventService {
     this._dragStart.set(row, col);
     this._payload.start = this._dragStart;
     this._dragEnd.set(row, col);
+    this.drawBorders();
     this._draw(true);
     this.tauriService.unRegisterDelete();
   }
@@ -120,6 +121,37 @@ export class EventService {
     this._draw(false, true);
     this.tauriService.registerDelete();
     this._dragEndEvent.next(this._dragStart);
+  }
+
+  private drawBorders() {
+    const topLeft = new Index(
+      Math.min(this._dragStart.row, this._dragEnd.row), 
+      Math.min(this._dragStart.col, this._dragEnd.col)
+    );
+    const bottomRight = new Index(
+      Math.max(this._dragStart.row, this._dragEnd.row), 
+      Math.max(this._dragStart.col, this._dragEnd.col)
+    );
+    
+    const topLeftBox = document.getElementById(topLeft.toString())?.getBoundingClientRect();
+
+    let horList = [];
+    for (let col = topLeft.col; col <= bottomRight.col; col++)
+      horList.push(new Index(topLeft.row, col));
+
+    let verList = [];
+    for (let row = topLeft.row; row <= bottomRight.row; row++)
+      verList.push(new Index(row, topLeft.col));
+
+    const width = horList.reduce((acc, curr) => {
+      const ref = document.getElementById(curr.toString())?.getBoundingClientRect();
+      return ref ? acc + ref.width : acc;
+    }, 0);
+
+    const height = verList.reduce((acc, curr) => {
+      const ref = document.getElementById(curr.toString())?.getBoundingClientRect();
+      return ref ? acc + ref.height : acc;
+    }, 0);
   }
 
   private calcBorders() {

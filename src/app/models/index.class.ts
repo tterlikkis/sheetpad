@@ -8,6 +8,10 @@ export class Index {
     this.col = col;
   }
 
+  public static compare(a: Index, b: Index): boolean {
+    return a.row === b.row && a.col === b.col;
+  }
+
   public pair(): [number, number] {
     return [this.row, this.col]
   }
@@ -17,8 +21,8 @@ export class Index {
     this.col = col;
   }
 
-  public static compare(a: Index, b: Index): boolean {
-    return a.row === b.row && a.col === b.col;
+  public toString() {
+    return `[${this.row}, ${this.col}]`;
   }
 
 }

@@ -31,6 +31,7 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
   @Input() selected: boolean = false
 
   showInput: boolean = false;
+  id: string = "";
   
   private _sub?: Subscription;
 
@@ -54,6 +55,7 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    this.id = this.index.toString();
     this._setCellBorder();
     this._setCellWidth();
     this._setCellHeight();

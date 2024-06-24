@@ -135,6 +135,8 @@ export class EventService {
     
     const topLeftBox = document.getElementById(topLeft.toString())?.getBoundingClientRect();
 
+
+    // TODO don't need to do this, can just use offsets of topLeft and bottomRight
     let horList = [];
     for (let col = topLeft.col; col <= bottomRight.col; col++)
       horList.push(new Index(topLeft.row, col));

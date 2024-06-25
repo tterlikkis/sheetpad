@@ -6,4 +6,13 @@
   border-color: rgb(0, 64, 164); //#011f79;
   border-width: 2px;
   z-index: 100;
+  background-color: rgb(0, 0, 0, 0.1);
+}
+
+.white-area {
+  margin: 1px;
+  box-sizing: border-box;
+  position: absolute;
+  background-color: white;
+  z-index: 99;
 }

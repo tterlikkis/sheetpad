@@ -110,63 +110,26 @@ export class EventService {
     this._payload.start = this._dragStart;
     this._dragEnd.set(row, col);
     this.emit();
-    // this._draw(true);
     this.tauriService.unRegisterDelete();
   }
 
   public dragMove(row: number, col: number) {
     this._dragEnd.set(row, col);
     this.emit();
-    // this._draw(); 
   } 
 
   public dragEnd() {
     this.isSelected = true;
     this.isDragging = false;
-    // this._draw(false, true);
     this.tauriService.registerDelete();
+    this.emit(true);
     this._dragEndEvent.next(this._dragStart);
   }
 
-  private emit() {
+  private emit(isEnd: boolean = false) {
     this._selectionEvent.emit({
-      start: this._dragStart, end: this._dragEnd
+      start: this._dragStart, end: this._dragEnd, isEnd: isEnd
     });
-  }
-
-  private calcBorders() {
-    const topLeft = new Index(
-      Math.min(this._dragStart.row, this._dragEnd.row), 
-      Math.min(this._dragStart.col, this._dragEnd.col)
-    );
-    const bottomRight = new Index(
-      Math.max(this._dragStart.row, this._dragEnd.row), 
-      Math.max(this._dragStart.col, this._dragEnd.col)
-    );
-    let col = topLeft.col
-    let row = topLeft.row;
-    this._payload = new StylePayload(this._dragStart);
-
-    // Left to right across the top
-    for (; col <= bottomRight.col; col++) this._payload.topList.push(new Index(row, col));
-    col--;
-
-    // Down the right
-    for (; row <= bottomRight.row; row++) this._payload.rightList.push(new Index(row, col));
-    row--;
-
-    // Right to left across the bottom
-    for (; col >= topLeft.col; col--) this._payload.bottomList.push(new Index(row, col));
-    col++;
-
-    // Up the left
-    for (; row >= topLeft.row; row--) this._payload.leftList.push(new Index(row, col));
-  }
-
-  private async _draw(dragStart: boolean = false, dragEnd: boolean = false) {
-    await this.gridService.clearStyle(this._payload, dragStart);
-    this.calcBorders();
-    await this.gridService.draw(this._payload, dragEnd);
   }
 
 }

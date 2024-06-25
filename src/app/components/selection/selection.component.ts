@@ -1,5 +1,6 @@
 import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { Corner } from 'src/app/models/corner.enum';
 import { Index } from 'src/app/models/index.class';
 import { NewSelectionPayload } from 'src/app/models/new-selection-payload.class';
 import { EventService } from 'src/app/services/event.service';
@@ -10,12 +11,6 @@ import { EventService } from 'src/app/services/event.service';
   styleUrls: ['./selection.component.scss']
 })
 export class SelectionComponent implements OnInit, OnDestroy {
-
-  @HostBinding('style.width.px') width: number = 0;
-  @HostBinding('style.height.px') height: number = 0;
-
-  @HostBinding('style.top.px') top: number = 0;
-  @HostBinding('style.left.px') left: number = 0;
 
   private _sub?: Subscription;
 
@@ -34,15 +29,15 @@ export class SelectionComponent implements OnInit, OnDestroy {
     this._sub = this.eventService.selectionEvent$.subscribe(this._drawBorders);
   }
 
+  private _checkCorner(start: Index, topLeft: Index, bottomRight: Index): Corner | undefined {
+    if (Index.compare(start, topLeft)) return Corner.TopLeft;
+    if (Index.compare(start, bottomRight)) return Corner.BottomRight;
+    if (start.row === topLeft.row) return Corner.TopLeft
+    if (start.col === bottomRight.col) return Corner.BottomRight;
+    return undefined;
+  }
+
   private _drawBorders(payload: NewSelectionPayload) {
-
-    console.dir({
-      left: this.left,
-      top: this.top,
-      width: this.width,
-      height: this.height
-    })
-
     const topLeft = new Index(
       Math.min(payload.start.row, payload.end.row),
       Math.min(payload.start.col, payload.end.col)
@@ -52,23 +47,56 @@ export class SelectionComponent implements OnInit, OnDestroy {
       Math.max(payload.start.col, payload.end.col)
     );
 
+    const startBox = document.getElementById(payload.start.toString())?.getBoundingClientRect();
     const topLeftBox = document.getElementById(topLeft.toString())?.getBoundingClientRect();
     const bottomRightBox = document.getElementById(bottomRight.toString())?.getBoundingClientRect();
-    if (!topLeftBox || !bottomRightBox) return;
+    if (!startBox || !topLeftBox || !bottomRightBox) return;
     
     const select = document.getElementById('select');
-    if (!select) return;
-    
-    select.style.left = `${topLeftBox.x - 1}px`;
-    select.style.top = `${topLeftBox.y - 1}px`;
-    select.style.width = `${bottomRightBox.x + bottomRightBox.width - topLeftBox.x}px`;
-    select.style.height = `${bottomRightBox.y + bottomRightBox.height - topLeftBox.y}px`;
+    const white = document.getElementById('white-area');
+    if (!select || !white) return;
 
-    console.dir({
-      left: this.left,
-      top: this.top,
-      width: this.width,
-      height: this.height
-    })
+    const left = topLeftBox.x - 1;
+    const top = topLeftBox.y - 1;
+    const width = bottomRightBox.x + bottomRightBox.width - topLeftBox.x
+    const height = bottomRightBox.y + bottomRightBox.height - topLeftBox.y;
+    
+    select.style.left = `${left}px`;
+    select.style.top = `${top}px`;
+    select.style.width = `${width}px`;
+    select.style.height = `${height}px`;
+    
+    if (payload.isEnd) {
+      const corner = 
+      select.style.backgroundColor = 'rgb(0, 0, 0, 0.1)';
+      white.style.top = `${startBox.top - top - 2}px`;
+      white.style.left = `${startBox.left - left - 2}px`;
+      white.style.width = `${startBox.width - 2}px`;
+      white.style.height = `${startBox.height - 2}px`;
+    }
+    else {
+      select.style.backgroundColor = 'transparent';
+      white.style.width = white.style.height = '0px';
+    }
+
+    // const tl = [startBox.left, startBox.top];
+    // const tr = [startBox.left + startBox.width, startBox.top];
+    // const bl = [startBox.left, startBox.top + startBox.height];
+    // const br = [startBox.left + startBox.width, startBox.top + startBox.height];
+    // white.style.clipPath = `polygon(${tl[0]}px ${tl[1]}px, ${tr[0]} ${tr[1]}, ${br[0]} ${br[1]}, ${bl[0]} ${bl[1]});`
+
+  }
+
+  private _getCornerPxOffset(prop: string, corner?: Corner) {
+    switch (corner) {
+      case Corner.TopLeft: return 2;
+      case Corner.BottomRight: return 3;
+      case Corner.TopRight:
+        return prop === 'width' || prop === 'left' ? 3 : 2;
+      case Corner.BottomLeft:
+        return prop === 'height' || prop === 'top' ? 3 : 2;
+      default: return 0;
+    }
   }
 }
+

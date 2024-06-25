@@ -4,6 +4,7 @@ import { Index } from '../models/index.class';
 import { StylePayload } from '../models/selection-payload.class';
 import { Observable } from 'rxjs';
 import { TauriService } from './tauri.service';
+import { NewSelectionPayload } from '../models/new-selection-payload.class';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,6 @@ export class EventService {
   private set isDragging(v : boolean) {
     this._isDragging = v;
   }
-
   
   private _isSelected : boolean = false;
   public get isSelected() : boolean {
@@ -27,14 +27,14 @@ export class EventService {
     this._isSelected = v;
   }
   
-
-  private _payload: StylePayload = new StylePayload();
-  
   private readonly _dragStart: Index = new Index();
   private readonly _dragEnd: Index = new Index();
 
   private readonly _dragEndEvent: EventEmitter<Index> = new EventEmitter<Index>();
   public readonly dragEndEvent$: Observable<Index> = this._dragEndEvent.asObservable();
+
+  private readonly _selectionEvent: EventEmitter<NewSelectionPayload> = new EventEmitter<NewSelectionPayload>();
+  public readonly selectionEvent$: Observable<NewSelectionPayload> = this._selectionEvent.asObservable();
 
 
   constructor(
@@ -72,13 +72,19 @@ export class EventService {
 
   private _consumeDeleteEvent() {
     this.tauriService.delEvent$.subscribe(() => {
-      this.gridService.clearGridSelection(this._payload);
+      const topLeft = Index.topLeft(this._dragStart, this._dragEnd)
+      const bottomRight = Index.bottomRight(this._dragStart, this._dragEnd);
+      this.gridService.clearGridSelection(Index.listBetween(topLeft, bottomRight));
     });
   }
 
   private _copySelected(isCut: boolean = false) {
     let copyText = "";
-    const list = this._payload.wholeList();
+
+    const topLeft = Index.topLeft(this._dragStart, this._dragEnd)
+    const bottomRight = Index.bottomRight(this._dragStart, this._dragEnd);
+    const list = Index.listBetween(topLeft, bottomRight);
+
     if (list.length === 0) return;
     let currentRow = list[0].row
     for (let i = 0; i < list.length; i++) {
@@ -86,15 +92,13 @@ export class EventService {
       if (currentRow !== index.row) {
         copyText += '\n';
       }
-      console.log(index)
-      console.log(this.gridService.grid[index.row][index.col])
       copyText += this.gridService.grid[index.row][index.col].text 
       if (i !== list.length - 1) {
         copyText += '\t';
       }
       currentRow = index.row;
     }
-    console.log(copyText)
+
     this.tauriService.copyToClipboard(copyText);
     if (isCut) this.gridService.updateCellText(list, '');
   }
@@ -103,58 +107,28 @@ export class EventService {
     this.isDragging = true;
     this.isSelected = false;
     this._dragStart.set(row, col);
-    this._payload.start = this._dragStart;
     this._dragEnd.set(row, col);
-    this._draw(true);
+    this.emit();
     this.tauriService.unRegisterDelete();
   }
 
   public dragMove(row: number, col: number) {
     this._dragEnd.set(row, col);
-    this._draw(); 
+    this.emit();
   } 
 
   public dragEnd() {
     this.isSelected = true;
     this.isDragging = false;
-    this._draw(false, true);
     this.tauriService.registerDelete();
+    this.emit();
     this._dragEndEvent.next(this._dragStart);
   }
 
-  private calcBorders() {
-    const topLeft = new Index(
-      Math.min(this._dragStart.row, this._dragEnd.row), 
-      Math.min(this._dragStart.col, this._dragEnd.col)
-    );
-    const bottomRight = new Index(
-      Math.max(this._dragStart.row, this._dragEnd.row), 
-      Math.max(this._dragStart.col, this._dragEnd.col)
-    );
-    let col = topLeft.col
-    let row = topLeft.row;
-    this._payload = new StylePayload(this._dragStart);
-
-    // Left to right across the top
-    for (; col <= bottomRight.col; col++) this._payload.topList.push(new Index(row, col));
-    col--;
-
-    // Down the right
-    for (; row <= bottomRight.row; row++) this._payload.rightList.push(new Index(row, col));
-    row--;
-
-    // Right to left across the bottom
-    for (; col >= topLeft.col; col--) this._payload.bottomList.push(new Index(row, col));
-    col++;
-
-    // Up the left
-    for (; row >= topLeft.row; row--) this._payload.leftList.push(new Index(row, col));
-  }
-
-  private async _draw(dragStart: boolean = false, dragEnd: boolean = false) {
-    await this.gridService.clearStyle(this._payload, dragStart);
-    this.calcBorders();
-    await this.gridService.draw(this._payload, dragEnd);
+  private emit() {
+    this._selectionEvent.emit({
+      start: this._dragStart, end: this._dragEnd
+    });
   }
 
 }

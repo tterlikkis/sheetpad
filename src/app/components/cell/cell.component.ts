@@ -23,25 +23,23 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
   @Input() width: number = 80;
   @Input() height: number = 20;
 
-  @Input() borderTop: boolean = false;
-  @Input() borderBottom: boolean = false;
-  @Input() borderLeft: boolean = false;
-  @Input() borderRight: boolean = false;
-
   @Input() selected: boolean = false
 
   showInput: boolean = false;
+  id: string = "";
   
   private _sub?: Subscription;
 
-  constructor(
-    private readonly eventService: EventService,
-  ) {}
+  constructor(private readonly eventService: EventService) {}
+
+  ngAfterViewInit(): void {
+    this.id = this.index.toString();
+    this._setCellWidth();
+    this._setCellHeight();
+    this._consumeDragEndEvent();
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (Object.keys(changes).some(key => key.includes('border'))) {
-      this._setCellBorder();
-    }
     if ("width" in changes) {
       this._setCellWidth();
     }
@@ -51,13 +49,6 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
     if ("selected" in changes) {
       this._setSelected();
     }
-  }
-
-  ngAfterViewInit(): void {
-    this._setCellBorder();
-    this._setCellWidth();
-    this._setCellHeight();
-    this._consumeDragEndEvent();
   }
 
   ngOnDestroy(): void {
@@ -75,15 +66,6 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
 
   focusOut() {
     this.showInput = false;
-  }
-
-  private _setCellBorder() {
-    if (!this.cellRef) return;
-    const val = (b: boolean) => b ? 'solid' : 'none';
-    this.cellRef.nativeElement.style.setProperty('--cell-border-top', val(this.borderTop));
-    this.cellRef.nativeElement.style.setProperty('--cell-border-bottom', val(this.borderBottom));
-    this.cellRef.nativeElement.style.setProperty('--cell-border-left', val(this.borderLeft));
-    this.cellRef.nativeElement.style.setProperty('--cell-border-right', val(this.borderRight));
   }
 
   private _setCellWidth() {

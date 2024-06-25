@@ -23,8 +23,6 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
   @Input() width: number = 80;
   @Input() height: number = 20;
 
-  @Input() selected: boolean = false
-
   showInput: boolean = false;
   id: string = "";
   
@@ -45,9 +43,6 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
     }
     if ("height" in changes) {
       this._setCellHeight();
-    }
-    if ("selected" in changes) {
-      this._setSelected();
     }
   }
 
@@ -74,10 +69,6 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
 
   private _setCellHeight() {
     this.cellRef?.nativeElement.style.setProperty('--cell-height', `${this.height}px`);
-  }
-
-  private _setSelected() {
-    this.cellRef?.nativeElement.style.setProperty('--cell-color', this.selected ? 'rgb(0, 0, 0, 0.1)' : 'transparent');
   }
 
   valueChange(event: any) {

@@ -1,6 +1,2 @@
-export interface NewSelectionPayload {
-  xOffset: number,
-  yOffset: number,
-  width: number,
-  height: number
-}
+import { Index } from "./index.class";
+export interface NewSelectionPayload { start: Index, end: Index }

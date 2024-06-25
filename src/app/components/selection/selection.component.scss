@@ -1,0 +1,9 @@
+:host {
+  pointer-events: none;
+  box-sizing: border-box;
+  position: absolute;
+  border: solid;
+  border-color: rgb(0, 64, 164); //#011f79;
+  border-width: 2px;
+  z-index: 1000;
+}

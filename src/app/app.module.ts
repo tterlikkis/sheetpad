@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { CellInputWidthPipe } from './pipes/cell-input-width/cell-input-width.pipe';
 import { GridComponent } from './components/grid/grid.component';
 import { HeaderComponent } from './components/header/header.component';
+import { SelectionComponent } from './components/selection/selection.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { HeaderComponent } from './components/header/header.component';
     CellComponent,
     CellInputWidthPipe,
     GridComponent,
-    HeaderComponent
+    HeaderComponent,
+    SelectionComponent
   ],
   imports: [
     BrowserModule,

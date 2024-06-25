@@ -4,6 +4,7 @@ import { Index } from '../models/index.class';
 import { StylePayload } from '../models/selection-payload.class';
 import { Observable } from 'rxjs';
 import { TauriService } from './tauri.service';
+import { NewSelectionPayload } from '../models/new-selection-payload.class';
 
 @Injectable({
   providedIn: 'root'
@@ -35,6 +36,9 @@ export class EventService {
 
   private readonly _dragEndEvent: EventEmitter<Index> = new EventEmitter<Index>();
   public readonly dragEndEvent$: Observable<Index> = this._dragEndEvent.asObservable();
+
+  private readonly _selectionEvent: EventEmitter<NewSelectionPayload> = new EventEmitter<NewSelectionPayload>();
+  public readonly selectionEvent$: Observable<NewSelectionPayload> = this._selectionEvent.asObservable();
 
 
   constructor(
@@ -105,55 +109,29 @@ export class EventService {
     this._dragStart.set(row, col);
     this._payload.start = this._dragStart;
     this._dragEnd.set(row, col);
-    this.drawBorders();
-    this._draw(true);
+    this.emit();
+    // this._draw(true);
     this.tauriService.unRegisterDelete();
   }
 
   public dragMove(row: number, col: number) {
     this._dragEnd.set(row, col);
-    this._draw(); 
+    this.emit();
+    // this._draw(); 
   } 
 
   public dragEnd() {
     this.isSelected = true;
     this.isDragging = false;
-    this._draw(false, true);
+    // this._draw(false, true);
     this.tauriService.registerDelete();
     this._dragEndEvent.next(this._dragStart);
   }
 
-  private drawBorders() {
-    const topLeft = new Index(
-      Math.min(this._dragStart.row, this._dragEnd.row), 
-      Math.min(this._dragStart.col, this._dragEnd.col)
-    );
-    const bottomRight = new Index(
-      Math.max(this._dragStart.row, this._dragEnd.row), 
-      Math.max(this._dragStart.col, this._dragEnd.col)
-    );
-    
-    const topLeftBox = document.getElementById(topLeft.toString())?.getBoundingClientRect();
-
-
-    // TODO don't need to do this, can just use offsets of topLeft and bottomRight
-    let horList = [];
-    for (let col = topLeft.col; col <= bottomRight.col; col++)
-      horList.push(new Index(topLeft.row, col));
-
-    let verList = [];
-    for (let row = topLeft.row; row <= bottomRight.row; row++)
-      verList.push(new Index(row, topLeft.col));
-
-    const width = horList.reduce((acc, curr) => {
-      const ref = document.getElementById(curr.toString())?.getBoundingClientRect();
-      return ref ? acc + ref.width : acc;
-    }, 0);
-
-    const height = verList.reduce((acc, curr) => {
-      const ref = document.getElementById(curr.toString())?.getBoundingClientRect();
-      return ref ? acc + ref.height : acc;
-    }, 0);
+  private emit() {
+    this._selectionEvent.emit({
+      start: this._dragStart, end: this._dragEnd
+    });
   }
 
   private calcBorders() {

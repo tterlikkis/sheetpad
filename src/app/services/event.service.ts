@@ -18,7 +18,6 @@ export class EventService {
   private set isDragging(v : boolean) {
     this._isDragging = v;
   }
-
   
   private _isSelected : boolean = false;
   public get isSelected() : boolean {
@@ -27,9 +26,6 @@ export class EventService {
   private set isSelected(v : boolean) {
     this._isSelected = v;
   }
-  
-
-  private _payload: StylePayload = new StylePayload();
   
   private readonly _dragStart: Index = new Index();
   private readonly _dragEnd: Index = new Index();
@@ -76,13 +72,19 @@ export class EventService {
 
   private _consumeDeleteEvent() {
     this.tauriService.delEvent$.subscribe(() => {
-      this.gridService.clearGridSelection(this._payload);
+      const topLeft = Index.topLeft(this._dragStart, this._dragEnd)
+      const bottomRight = Index.bottomRight(this._dragStart, this._dragEnd);
+      this.gridService.clearGridSelection(Index.listBetween(topLeft, bottomRight));
     });
   }
 
   private _copySelected(isCut: boolean = false) {
     let copyText = "";
-    const list = this._payload.wholeList();
+
+    const topLeft = Index.topLeft(this._dragStart, this._dragEnd)
+    const bottomRight = Index.bottomRight(this._dragStart, this._dragEnd);
+    const list = Index.listBetween(topLeft, bottomRight);
+
     if (list.length === 0) return;
     let currentRow = list[0].row
     for (let i = 0; i < list.length; i++) {
@@ -90,15 +92,13 @@ export class EventService {
       if (currentRow !== index.row) {
         copyText += '\n';
       }
-      console.log(index)
-      console.log(this.gridService.grid[index.row][index.col])
       copyText += this.gridService.grid[index.row][index.col].text 
       if (i !== list.length - 1) {
         copyText += '\t';
       }
       currentRow = index.row;
     }
-    console.log(copyText)
+
     this.tauriService.copyToClipboard(copyText);
     if (isCut) this.gridService.updateCellText(list, '');
   }
@@ -107,7 +107,6 @@ export class EventService {
     this.isDragging = true;
     this.isSelected = false;
     this._dragStart.set(row, col);
-    this._payload.start = this._dragStart;
     this._dragEnd.set(row, col);
     this.emit();
     this.tauriService.unRegisterDelete();
@@ -122,13 +121,13 @@ export class EventService {
     this.isSelected = true;
     this.isDragging = false;
     this.tauriService.registerDelete();
-    this.emit(true);
+    this.emit();
     this._dragEndEvent.next(this._dragStart);
   }
 
-  private emit(isEnd: boolean = false) {
+  private emit() {
     this._selectionEvent.emit({
-      start: this._dragStart, end: this._dragEnd, isEnd: isEnd
+      start: this._dragStart, end: this._dragEnd
     });
   }
 

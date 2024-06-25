@@ -8,9 +8,7 @@ export class Index {
     this.col = col;
   }
 
-  public static compare(a: Index, b: Index): boolean {
-    return a.row === b.row && a.col === b.col;
-  }
+
 
   public pair(): [number, number] {
     return [this.row, this.col]
@@ -23,6 +21,32 @@ export class Index {
 
   public toString() {
     return `[${this.row}, ${this.col}]`;
+  }
+
+  public static compare(a: Index, b: Index): boolean {
+    return a.row === b.row && a.col === b.col;
+  }
+
+  public static bottomRight(a: Index, b: Index) {
+    return new Index(
+      Math.max(a.row, b.row), Math.max(a.col, b.col)
+    );
+  }
+
+  public static listBetween(topLeft: Index, bottomRight: Index) {
+    let result: Index[] = [];
+    for (let row = topLeft.row; row <= bottomRight.row; row++) {
+      for (let col = topLeft.col; col <= bottomRight.col; col++) {
+        result.push(new Index(row, col));
+      }
+    }
+    return result;
+  }
+
+  public static topLeft(a: Index, b: Index) {
+    return new Index(
+      Math.min(a.row, b.row), Math.min(a.col, b.col)
+    );
   }
 
 }

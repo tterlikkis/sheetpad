@@ -53,7 +53,7 @@ export class GridService {
 
   private _generateGrid() {
     let newGrid: CellData[][] = [];
-    for (let i = 0; i < 35; i++) { // originally 100
+    for (let i = 0; i < 100; i++) { // originally 100
       newGrid.push([]);
       for (let j = 0; j < 26; j++) { // originally 26
         newGrid[i].push(new CellData(i, j));
@@ -62,28 +62,13 @@ export class GridService {
     this._grid.next(newGrid);
   }
 
-  public clearGridSelection(payload: SelectionPayload) {
+  public clearGridSelection(list: Index[]) {
     let newGrid = [ ...this.grid ];
-    for (const index of payload.wholeList()) {
+    for (const index of list) {
       newGrid[index.row][index.col].text = "";
     }
     this.grid = newGrid;
     this._refreshEvent.emit();
-  }
-
-  public async clearStyle(payload: SelectionPayload, dragEnd: boolean = false) {
-    let newGrid = [ ...this.grid ];
-    for (const index of payload.borderList()) {
-      newGrid[index.row][index.col].border = {
-        top: false, bottom: false, left: false, right: false
-      };
-    }
-    if (dragEnd) {
-      for (const index of payload.listWithoutStart()) {
-        newGrid[index.row][index.col].selected = false;
-      }
-    }
-    this.grid = newGrid;
   }
 
   private _consumeColumnChanges() {
@@ -105,18 +90,6 @@ export class GridService {
         this._rowLength = val.length;
       }
     })
-  }
-
-  public async draw(payload: SelectionPayload, dragEnd: boolean = false) {
-    // await this.clearStyle(payload, dragEnd);
-    let newGrid = [ ...this.grid ];
-    for (const index of payload.topList) newGrid[index.row][index.col].border.top = true;
-    for (const index of payload.bottomList) newGrid[index.row][index.col].border.bottom = true;
-    for (const index of payload.leftList) newGrid[index.row][index.col].border.left = true;
-    for (const index of payload.rightList) newGrid[index.row][index.col].border.right = true;
-    if (dragEnd)
-      for (const index of payload.listWithoutStart()) newGrid[index.row][index.col].selected = true;
-    this.grid = newGrid;
   }
 
   public pasteToGrid(start: Index, text: string) {

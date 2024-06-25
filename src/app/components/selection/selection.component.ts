@@ -1,4 +1,4 @@
-import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Corner } from 'src/app/models/corner.enum';
 import { Index } from 'src/app/models/index.class';
@@ -26,14 +26,14 @@ export class SelectionComponent implements OnInit, OnDestroy {
 
   private _consumeSelectionEvent() {
     this._sub?.unsubscribe();
-    this._sub = this.eventService.selectionEvent$.subscribe(this._drawBorders);
+    this._sub = this.eventService.selectionEvent$.subscribe(payload => this._drawBorders(payload));
   }
 
   private _checkCorner(start: Index, topLeft: Index, bottomRight: Index): Corner | undefined {
     if (Index.compare(start, topLeft)) return Corner.TopLeft;
     if (Index.compare(start, bottomRight)) return Corner.BottomRight;
-    if (start.row === topLeft.row) return Corner.TopLeft
-    if (start.col === bottomRight.col) return Corner.BottomRight;
+    if (start.col === bottomRight.col && start.row === topLeft.row) return Corner.TopRight;
+    if (start.col === topLeft.col && start.row === bottomRight.row) return Corner.BottomLeft;
     return undefined;
   }
 
@@ -52,51 +52,90 @@ export class SelectionComponent implements OnInit, OnDestroy {
     const bottomRightBox = document.getElementById(bottomRight.toString())?.getBoundingClientRect();
     if (!startBox || !topLeftBox || !bottomRightBox) return;
     
-    const select = document.getElementById('select');
-    const white = document.getElementById('white-area');
-    if (!select || !white) return;
+    const border = document.getElementById('border-area');
+    const grey = document.getElementById('grey-area');
+    if (!border || !grey) return;
 
-    const left = topLeftBox.x - 1;
-    const top = topLeftBox.y - 1;
-    const width = bottomRightBox.x + bottomRightBox.width - topLeftBox.x
-    const height = bottomRightBox.y + bottomRightBox.height - topLeftBox.y;
+    const box = new DOMRect(
+      topLeftBox.x - 1, 
+      topLeftBox.y - 1,
+      bottomRightBox.x + bottomRightBox.width - topLeftBox.x,
+      bottomRightBox.y + bottomRightBox.height - topLeftBox.y
+    )
     
-    select.style.left = `${left}px`;
-    select.style.top = `${top}px`;
-    select.style.width = `${width}px`;
-    select.style.height = `${height}px`;
+    border.style.left = `${box.x}px`;
+    border.style.top = `${box.y}px`;
+    border.style.width = `${box.width}px`;
+    border.style.height = `${box.height}px`;
     
-    if (payload.isEnd) {
-      const corner = 
-      select.style.backgroundColor = 'rgb(0, 0, 0, 0.1)';
-      white.style.top = `${startBox.top - top - 2}px`;
-      white.style.left = `${startBox.left - left - 2}px`;
-      white.style.width = `${startBox.width - 2}px`;
-      white.style.height = `${startBox.height - 2}px`;
+    if (!Index.compare(payload.start, payload.end)) {
+      const corner = this._checkCorner(payload.start, topLeft, bottomRight);
+      if (corner === undefined) return;
+      grey.style.top = `${box.y}px`;
+      grey.style.left = `${box.x}px`;
+      grey.style.width = `${box.width}px`;
+      grey.style.height = `${box.height}px`;
+      grey.style.clipPath = this._getClipPath(box, startBox, corner)
     }
     else {
-      select.style.backgroundColor = 'transparent';
-      white.style.width = white.style.height = '0px';
+      grey.style.clipPath = 'none';
+      grey.style.width = grey.style.height = '0px';
     }
-
-    // const tl = [startBox.left, startBox.top];
-    // const tr = [startBox.left + startBox.width, startBox.top];
-    // const bl = [startBox.left, startBox.top + startBox.height];
-    // const br = [startBox.left + startBox.width, startBox.top + startBox.height];
-    // white.style.clipPath = `polygon(${tl[0]}px ${tl[1]}px, ${tr[0]} ${tr[1]}, ${br[0]} ${br[1]}, ${bl[0]} ${bl[1]});`
 
   }
 
-  private _getCornerPxOffset(prop: string, corner?: Corner) {
+  private _getClipPath(box: DOMRect, start: DOMRect, corner: Corner) {
+    let result: [number, number][];
     switch (corner) {
-      case Corner.TopLeft: return 2;
-      case Corner.BottomRight: return 3;
+      case Corner.TopLeft:
+        result = [
+          [start.width, 0],
+          [box.width, 0],
+          [box.width, box.height],
+          [0, box.height],
+          [0, start.height],
+          [start.width, start.height]
+        ];
+        break;
       case Corner.TopRight:
-        return prop === 'width' || prop === 'left' ? 3 : 2;
+        result = [
+          [0, 0],
+          [box.width-start.width, 0],
+          [box.width-start.width, start.height],
+          [box.width, start.height],
+          [box.width, box.height],
+          [0, box.height]
+        ];
+        break;
       case Corner.BottomLeft:
-        return prop === 'height' || prop === 'top' ? 3 : 2;
-      default: return 0;
+        result = [
+          [0, 0],
+          [box.width, 0],
+          [box.width, box.height],
+          [start.width, box.height],
+          [start.width, box.height-start.height],
+          [0, box.height-start.height]
+        ];
+        break;
+      case Corner.BottomRight:
+        result = [
+          [0, 0],
+          [box.width, 0],
+          [box.width, box.height-start.height],
+          [box.width-start.width, box.height- start.height],
+          [box.width-start.width, box.height],
+          [0, box.height]
+        ];
+        break;
+      default:
+        result = [];
+        break;
     }
+    return result.reduce((acc, curr, idx) => {
+      if (idx !== 0) acc += ', ';
+      return acc + `${curr[0]}px ${curr[1]}px`;
+    }, "polygon(") + ')';
   }
+
 }
 

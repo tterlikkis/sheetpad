@@ -45,8 +45,11 @@ export class TauriService {
   private readonly _shiftArrowRightEvent = new EventEmitter();
   public readonly shiftArrowRightEvent$ = this._shiftArrowRightEvent.asObservable();
 
+  private _delWasRegistered: boolean = false;
+
   constructor() { 
     this._consumeWindowEvents();
+    this._windowFocus();
   }
 
   private async _consumeWindowEvents() {
@@ -69,10 +72,12 @@ export class TauriService {
     if (result) return;
     console.log('Registering delete');
     await register(str, () => this._delEvent.emit());
+    this._delWasRegistered = true;
   }
 
   public async unRegisterDelete() {
     await unregister('Delete');
+    this._delWasRegistered = false;
   }
 
   private async _windowFocus() {
@@ -97,6 +102,8 @@ export class TauriService {
         events[key].emit()
       });
     }
+
+    if (this._delWasRegistered) this.registerDelete();
   }
 
   private async _windowFocusOut() {

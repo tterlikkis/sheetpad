@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Corner } from 'src/app/models/corner.enum';
 import { Index } from 'src/app/models/index.class';
@@ -14,6 +14,9 @@ export class SelectionComponent implements OnInit, OnDestroy {
 
   private _sub?: Subscription;
 
+  private X: number = 0;
+  private Y: number = 0;
+
   constructor(private readonly eventService: EventService) {}
 
   ngOnInit(): void {
@@ -22,6 +25,23 @@ export class SelectionComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this._sub?.unsubscribe();
+  }
+
+  @HostListener('window:scroll', [])
+  onResize() {
+    this.X = window.scrollX;
+    this.Y = window.scrollY;
+    console.log(this.X)
+    console.log(this.Y)
+  }
+
+  private _addScrollOffset(rect?: DOMRect) {
+    return new DOMRect(
+      (rect?.x || 0) + this.X/2,
+      (rect?.y || 0) + this.Y/2,
+      rect?.width || 0,
+      rect?.height || 0
+    );
   }
 
   private _consumeSelectionEvent() {
@@ -47,21 +67,19 @@ export class SelectionComponent implements OnInit, OnDestroy {
       Math.max(payload.start.col, payload.end.col)
     );
 
-    const startBox = document.getElementById(payload.start.toString())?.getBoundingClientRect();
-    const topLeftBox = document.getElementById(topLeft.toString())?.getBoundingClientRect();
-    const bottomRightBox = document.getElementById(bottomRight.toString())?.getBoundingClientRect();
-    if (!startBox || !topLeftBox || !bottomRightBox) return;
-    
+    const startBox = this._addScrollOffset(document.getElementById(payload.start.toString())?.getBoundingClientRect());
+    const topLeftBox = this._addScrollOffset(document.getElementById(topLeft.toString())?.getBoundingClientRect());
+    const bottomRightBox = this._addScrollOffset(document.getElementById(bottomRight.toString())?.getBoundingClientRect());
     const border = document.getElementById('border-area');
     const grey = document.getElementById('grey-area');
-    if (!border || !grey) return;
-
-    const box = new DOMRect(
+    if (!startBox || !topLeftBox || !bottomRightBox || !border || !grey) return;
+    
+    const box = this._addScrollOffset(new DOMRect(
       topLeftBox.x - 1, 
       topLeftBox.y - 1,
       bottomRightBox.x + bottomRightBox.width - topLeftBox.x,
       bottomRightBox.y + bottomRightBox.height - topLeftBox.y
-    )
+    ))
     
     border.style.left = `${box.x}px`;
     border.style.top = `${box.y}px`;

@@ -2,6 +2,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { isRegistered, register, unregister, unregisterAll } from '@tauri-apps/api/globalShortcut';
 import { listen } from '@tauri-apps/api/event';
 import { readText, writeText } from '@tauri-apps/api/clipboard';
+import { Indexable } from '../models/indexable.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -50,49 +51,6 @@ export class TauriService {
     return (await readText()) || '';
   }
 
-  private async _registerArrowUp(){
-    const str = 'ArrowUp';
-    const result = await isRegistered(str);
-    if (result) return;
-    await register(str, () => this._arrowUpEvent.emit());
-  }
-
-  private async _registerArrowDown(){
-    const str = 'ArrowDown';
-    const result = await isRegistered(str);
-    if (result) return;
-    await register(str, () => this._arrowDownEvent.emit());
-  }
-
-  private async _registerArrowLeft(){
-    const str = 'ArrowLeft';
-    const result = await isRegistered(str);
-    if (result) return;
-    await register(str, () => this._arrowLeftEvent.emit());
-  }
-
-  private async _registerArrowRight(){
-    const str = 'ArrowRight';
-    const result = await isRegistered(str);
-    if (result) return;
-    await register(str, () => this._arrowRightEvent.emit());
-  }
-
-
-  private async _registerCopy() {
-    const str = 'CommandOrControl+C';
-    const result = await isRegistered(str);
-    if (result) return;
-    await register(str, () => this._ctrlCEvent.emit());
-  }
-
-  private async _registerCut() {
-    const str = 'CommandOrControl+X';
-    const result = await isRegistered(str);
-    if (result) return;
-    await register(str, () => this._ctrlXEvent.emit());
-  }
-
   public async registerDelete() {
     const str = 'Delete';
     const result = await isRegistered(str);
@@ -101,25 +59,26 @@ export class TauriService {
     await register(str, () => this._delEvent.emit());
   }
 
-  private async _registerPaste() {
-    const str = 'CommandOrControl+V';
-    const result = await isRegistered(str);
-    if (result) return;
-    await register(str, () => this._ctrlVEvent.emit());
-  }
-
   public async unRegisterDelete() {
     await unregister('Delete');
   }
 
-  private _windowFocus() {
-    this._registerArrowUp();
-    this._registerArrowDown();
-    this._registerArrowLeft();
-    this._registerArrowRight();
-    this._registerCopy();
-    this._registerCut();
-    this._registerPaste();
+  private async _windowFocus() {
+    const events: Indexable<EventEmitter<void>> = {
+      'ArrowUp': this._arrowUpEvent, 
+      'ArrowDown': this._arrowDownEvent, 
+      'ArrowLeft': this._arrowLeftEvent, 
+      'ArrowRight': this._arrowRightEvent, 
+      'CommandOrControl+C': this._ctrlCEvent, 
+      'CommandOrControl+X': this._ctrlVEvent, 
+      'CommandOrControl+V': this._ctrlVEvent,
+    }
+
+    for (const key in events) {
+      const result = await isRegistered(key);
+      if (result) continue;
+      await register(key, () => events[key].emit());
+    }
   }
 
   private async _windowFocusOut() {

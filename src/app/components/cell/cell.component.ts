@@ -56,6 +56,7 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
         this.showInput = true;
         setTimeout(() => this.input?.nativeElement.focus(), 0);
       }
+      else { this.input?.nativeElement.blur(); }
     });
   }
 

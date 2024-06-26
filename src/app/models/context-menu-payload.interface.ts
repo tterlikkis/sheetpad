@@ -1,0 +1,1 @@
+export interface ContextMenuPayload { x: number, y: number }

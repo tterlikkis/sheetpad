@@ -11,6 +11,7 @@ import { CellInputWidthPipe } from './pipes/cell-input-width/cell-input-width.pi
 import { GridComponent } from './components/grid/grid.component';
 import { HeaderComponent } from './components/header/header.component';
 import { SelectionComponent } from './components/selection/selection.component';
+import { ContextMenuComponent } from './components/context-menu/context-menu.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { SelectionComponent } from './components/selection/selection.component';
     CellInputWidthPipe,
     GridComponent,
     HeaderComponent,
-    SelectionComponent
+    SelectionComponent,
+    ContextMenuComponent
   ],
   imports: [
     BrowserModule,

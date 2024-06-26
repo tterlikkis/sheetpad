@@ -4,6 +4,7 @@ import { Index } from '../../models/index.class';
 import { Observable } from 'rxjs';
 import { TauriService } from '../tauri/tauri.service';
 import { SelectionPayload } from '../../models/selection-payload.class';
+import { ContextMenuPayload } from 'src/app/models/context-menu-payload.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +30,9 @@ export class EventService {
   private readonly _dragStart: Index = new Index();
   private readonly _dragEnd: Index = new Index();
 
+  private readonly _contextMenuEvent: EventEmitter<ContextMenuPayload> = new EventEmitter<ContextMenuPayload>();
+  public readonly contextMenuEvent$: Observable<ContextMenuPayload> = this._contextMenuEvent.asObservable();
+
   private readonly _dragStartEvent: EventEmitter<void> = new EventEmitter();
   public readonly dragStartEvent$: Observable<void> = this._dragStartEvent.asObservable();
 
@@ -43,6 +47,7 @@ export class EventService {
     private readonly tauriService: TauriService
   ) { 
     this._consumeArrowEvents();
+    this._consumeContextMenuEvent();
     this._consumeCtrlCEvent();
     this._consumeCtrlXEvent();
     this._consumeCtrlVEvent();
@@ -83,6 +88,15 @@ export class EventService {
     this.tauriService.arrowDownEvent$.subscribe(() => this._arrowEvent('down'));
     this.tauriService.arrowLeftEvent$.subscribe(() => this._arrowEvent('left'));
     this.tauriService.arrowRightEvent$.subscribe(() => this._arrowEvent('right'));
+  }
+
+  private _consumeContextMenuEvent() {
+    addEventListener('contextmenu', (event) => {
+      const payload: ContextMenuPayload = {
+        x: event.clientX, y: event.clientY
+      };
+      this._contextMenuEvent.emit(payload);
+    });
   }
 
   private _consumeCtrlCEvent() {

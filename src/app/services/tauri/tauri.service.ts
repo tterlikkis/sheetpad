@@ -49,13 +49,13 @@ export class TauriService {
 
   constructor() { 
     this._consumeWindowEvents();
-    this._windowFocus();
+    // this._windowFocus();
   }
 
   private async _consumeWindowEvents() {
-    await listen('tauri://window-created', (event) => this._windowFocus());
-    await listen('tauri://focus', (event) => this._windowFocus());
-    await listen('tauri://blur', (event) => this._windowFocusOut());
+    await listen('tauri://window-created', () => this._windowFocus());
+    await listen('tauri://focus', () => this._windowFocus());
+    await listen('tauri://blur', () => this._windowFocusOut());
   }
 
   public async copyToClipboard(text: string) {

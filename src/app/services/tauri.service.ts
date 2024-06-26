@@ -9,29 +9,41 @@ import { Indexable } from '../models/indexable.interface';
 })
 export class TauriService {
 
-  private readonly _arrowUpEvent: EventEmitter<void> = new EventEmitter();
+  private readonly _arrowUpEvent = new EventEmitter();
   public readonly arrowUpEvent$ = this._arrowUpEvent.asObservable();
 
-  private readonly _arrowDownEvent: EventEmitter<void> = new EventEmitter();
+  private readonly _arrowDownEvent = new EventEmitter();
   public readonly arrowDownEvent$ = this._arrowDownEvent.asObservable();
 
-  private readonly _arrowLeftEvent: EventEmitter<void> = new EventEmitter();
+  private readonly _arrowLeftEvent = new EventEmitter();
   public readonly arrowLeftEvent$ = this._arrowLeftEvent.asObservable();
 
-  private readonly _arrowRightEvent: EventEmitter<void> = new EventEmitter();
+  private readonly _arrowRightEvent = new EventEmitter();
   public readonly arrowRightEvent$ = this._arrowRightEvent.asObservable();
 
-  private readonly _ctrlCEvent: EventEmitter<void> = new EventEmitter();
+  private readonly _ctrlCEvent = new EventEmitter();
   public readonly ctrlCEvent$ = this._ctrlCEvent.asObservable();
 
-  private readonly _ctrlXEvent: EventEmitter<void> = new EventEmitter();
+  private readonly _ctrlXEvent = new EventEmitter();
   public readonly ctrlXEvent$ = this._ctrlXEvent.asObservable();
 
-  private readonly _ctrlVEvent: EventEmitter<void> = new EventEmitter();
+  private readonly _ctrlVEvent = new EventEmitter();
   public readonly ctrlVEvent$ = this._ctrlVEvent.asObservable();
 
-  private readonly _delEvent: EventEmitter<void> = new EventEmitter();
+  private readonly _delEvent = new EventEmitter();
   public readonly delEvent$ = this._delEvent.asObservable();
+
+  private readonly _shiftArrowUpEvent = new EventEmitter();
+  public readonly shiftArrowUpEvent$ = this._shiftArrowUpEvent.asObservable();
+
+  private readonly _shiftArrowDownEvent = new EventEmitter();
+  public readonly shiftArrowDownEvent$ = this._shiftArrowDownEvent.asObservable();
+
+  private readonly _shiftArrowLeftEvent = new EventEmitter();
+  public readonly shiftArrowLeftEvent$ = this._shiftArrowLeftEvent.asObservable();
+
+  private readonly _shiftArrowRightEvent = new EventEmitter();
+  public readonly shiftArrowRightEvent$ = this._shiftArrowRightEvent.asObservable();
 
   constructor() { 
     this._consumeWindowEvents();
@@ -72,12 +84,18 @@ export class TauriService {
       'CommandOrControl+C': this._ctrlCEvent, 
       'CommandOrControl+X': this._ctrlVEvent, 
       'CommandOrControl+V': this._ctrlVEvent,
+      'Shift+ArrowUp': this._shiftArrowUpEvent,
+      'Shift+ArrowDown': this._shiftArrowDownEvent,
+      'Shift+ArrowLeft': this._shiftArrowLeftEvent,
+      'Shift+ArrowRight': this._shiftArrowRightEvent,
     }
 
     for (const key in events) {
       const result = await isRegistered(key);
       if (result) continue;
-      await register(key, () => events[key].emit());
+      await register(key, () => {
+        events[key].emit()
+      });
     }
   }
 

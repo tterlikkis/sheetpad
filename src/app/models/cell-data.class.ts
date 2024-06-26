@@ -1,4 +1,3 @@
-import { Border } from "./border.interface";
 import { Index } from "./index.class";
 
 export class CellData {

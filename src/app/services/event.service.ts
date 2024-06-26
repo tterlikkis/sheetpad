@@ -1,10 +1,9 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { GridService } from './grid.service';
 import { Index } from '../models/index.class';
-import { StylePayload } from '../models/selection-payload.class';
 import { Observable } from 'rxjs';
 import { TauriService } from './tauri.service';
-import { NewSelectionPayload } from '../models/new-selection-payload.class';
+import { SelectionPayload } from '../models/selection-payload.class';
 
 @Injectable({
   providedIn: 'root'
@@ -33,22 +32,54 @@ export class EventService {
   private readonly _dragEndEvent: EventEmitter<Index> = new EventEmitter<Index>();
   public readonly dragEndEvent$: Observable<Index> = this._dragEndEvent.asObservable();
 
-  private readonly _selectionEvent: EventEmitter<NewSelectionPayload> = new EventEmitter<NewSelectionPayload>();
-  public readonly selectionEvent$: Observable<NewSelectionPayload> = this._selectionEvent.asObservable();
-
+  private readonly _selectionEvent: EventEmitter<SelectionPayload> = new EventEmitter<SelectionPayload>();
+  public readonly selectionEvent$: Observable<SelectionPayload> = this._selectionEvent.asObservable();
 
   constructor(
     private readonly gridService: GridService,
     private readonly tauriService: TauriService
   ) { 
+    this._consumeArrowEvents();
     this._consumeCtrlCEvent();
     this._consumeCtrlXEvent();
     this._consumeCtrlVEvent();
     this._consumeDeleteEvent();
+    this._consumeShiftArrowEvents();
   }
 
   public test(index: Index, text: string) {
     this.gridService.updateCellText(index, text);
+  }
+
+  private _arrowEvent(direction: 'up' | 'down' | 'left' | 'right', holdShift: boolean = false) {
+    if (!this.isSelected) return;
+    let newIndex = holdShift ? this._dragEnd : this._dragStart;
+    switch (direction) {
+      case 'up':
+        if (newIndex.row > 0) newIndex.row--;
+        break;
+      case 'down':
+        newIndex.row++;
+        break;
+      case 'left':
+        if (newIndex.col > 0) newIndex.col--;
+        break;
+      case 'right':
+        newIndex.col++;
+        break;
+    }
+    if (!holdShift) this._dragStart.set(newIndex.row, newIndex.col);
+    this._dragEnd.set(newIndex.row, newIndex.col);
+    this.emit();
+    this._dragEndEvent.emit(this._dragStart)
+  }
+
+
+  private _consumeArrowEvents() {
+    this.tauriService.arrowUpEvent$.subscribe(() => this._arrowEvent('up'));
+    this.tauriService.arrowDownEvent$.subscribe(() => this._arrowEvent('down'));
+    this.tauriService.arrowLeftEvent$.subscribe(() => this._arrowEvent('left'));
+    this.tauriService.arrowRightEvent$.subscribe(() => this._arrowEvent('right'));
   }
 
   private _consumeCtrlCEvent() {
@@ -76,6 +107,13 @@ export class EventService {
       const bottomRight = Index.bottomRight(this._dragStart, this._dragEnd);
       this.gridService.clearGridSelection(Index.listBetween(topLeft, bottomRight));
     });
+  }
+
+  private _consumeShiftArrowEvents() {
+    this.tauriService.shiftArrowUpEvent$.subscribe(() =>  this._arrowEvent('up', true));
+    this.tauriService.shiftArrowDownEvent$.subscribe(() => this._arrowEvent('down', true));
+    this.tauriService.shiftArrowLeftEvent$.subscribe(() => this._arrowEvent('left', true));
+    this.tauriService.shiftArrowRightEvent$.subscribe(() => this._arrowEvent('right', true));
   }
 
   private _copySelected(isCut: boolean = false) {

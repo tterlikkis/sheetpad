@@ -2,7 +2,7 @@ import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Corner } from 'src/app/models/corner.enum';
 import { Index } from 'src/app/models/index.class';
-import { NewSelectionPayload } from 'src/app/models/new-selection-payload.class';
+import { SelectionPayload } from 'src/app/models/selection-payload.class';
 import { EventService } from 'src/app/services/event.service';
 
 @Component({
@@ -14,6 +14,7 @@ export class SelectionComponent implements OnInit, OnDestroy {
 
   private _sub?: Subscription;
 
+  // Scroll Offsets
   private X: number = 0;
   private Y: number = 0;
 
@@ -44,7 +45,7 @@ export class SelectionComponent implements OnInit, OnDestroy {
 
   private _consumeSelectionEvent() {
     this._sub?.unsubscribe();
-    this._sub = this.eventService.selectionEvent$.subscribe(payload => this._drawBorders(payload));
+    this._sub = this.eventService.selectionEvent$.subscribe(payload => this._drawSelection(payload));
   }
 
   private _checkCorner(start: Index, topLeft: Index, bottomRight: Index): Corner | undefined {
@@ -55,21 +56,23 @@ export class SelectionComponent implements OnInit, OnDestroy {
     return undefined;
   }
 
-  private _drawBorders(payload: NewSelectionPayload) {
-    const topLeft = new Index(
-      Math.min(payload.start.row, payload.end.row),
-      Math.min(payload.start.col, payload.end.col)
-    );
-    const bottomRight = new Index(
-      Math.max(payload.start.row, payload.end.row),
-      Math.max(payload.start.col, payload.end.col)
-    );
+  private _drawSelection(payload: SelectionPayload) {
+    const topLeft = Index.topLeft(payload.start, payload.end);
+    const bottomRight = Index.bottomRight(payload.start, payload.end);
 
-    const startBox = this._addScrollOffset(document.getElementById(payload.start.toString())?.getBoundingClientRect());
-    const topLeftBox = this._addScrollOffset(document.getElementById(topLeft.toString())?.getBoundingClientRect());
-    const bottomRightBox = this._addScrollOffset(document.getElementById(bottomRight.toString())?.getBoundingClientRect());
+    const startBox = this._addScrollOffset(
+      document.getElementById(payload.start.toString())?.getBoundingClientRect()
+    );
+    const topLeftBox = this._addScrollOffset(
+      document.getElementById(topLeft.toString())?.getBoundingClientRect()
+    );
+    const bottomRightBox = this._addScrollOffset(
+      document.getElementById(bottomRight.toString())?.getBoundingClientRect()
+    )
+    ;
     const border = document.getElementById('border-area');
     const grey = document.getElementById('grey-area');
+    
     if (!startBox || !topLeftBox || !bottomRightBox || !border || !grey) return;
     
     const box = this._addScrollOffset(new DOMRect(

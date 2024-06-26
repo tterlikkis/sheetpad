@@ -1,6 +1,5 @@
 import { AfterViewInit, Component, ElementRef, HostBinding, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { Border } from 'src/app/models/border.interface';
 import { CellData } from 'src/app/models/cell-data.class';
 import { Index } from 'src/app/models/index.class';
 import { EventService } from 'src/app/services/event.service';

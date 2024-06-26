@@ -8,8 +8,6 @@ export class Index {
     this.col = col;
   }
 
-
-
   public pair(): [number, number] {
     return [this.row, this.col]
   }

@@ -22,8 +22,20 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
   @Input() width: number = 80;
   @Input() height: number = 20;
 
-  showInput: boolean = false;
   id: string = "";
+  
+  showInput: boolean = false;
+  // public get showInput() {
+  //   return this._showInput;
+  // }
+  // private set showInput(v: boolean) {
+  //   if (v) setTimeout(() => {
+  //     console.log(this.input!.nativeElement.hidden);
+  //     this.input!.nativeElement.focus();
+  //   }, 1000);
+  //   else this.input?.nativeElement.blur();
+  //   this._showInput = v;
+  // }
   
   private _startSub?: Subscription;
   private _endSub?: Subscription;
@@ -54,9 +66,11 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
 
   private _consumeDragStartEvents() {
     this._startSub?.unsubscribe();
-    this._startSub = this.eventService.dragStartEvent$.subscribe(() => 
-      this.showInput = false
-    );
+    this._startSub = this.eventService.dragStartEvent$.subscribe(() => {
+      this.showInput = false;
+      this.input!.nativeElement.blur();
+      this.input!.nativeElement.hidden = true;
+    });
   }
 
   private _consumeDragEndEvent() {
@@ -64,7 +78,8 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
     this._endSub = this.eventService.dragEndEvent$.subscribe(val => {
       if (Index.compare(val, this.index)) {
         this.showInput = true;
-        setTimeout(() => this.input?.nativeElement.focus(), 0);
+        this.input!.nativeElement.hidden = false;
+        setTimeout(() => this.input!.nativeElement.focus(), 0);
       }
     });
   }

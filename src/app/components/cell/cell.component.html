@@ -4,7 +4,6 @@
     #input
     class="edit-box" 
     [size]="value.length | cellInputWidth"
-    [hidden]="!showInput" 
     (focusout)="focusOut()"
     [ngModel]="value"
     (ngModelChange)="valueChange($event)"

@@ -67,19 +67,21 @@ export class EventService {
         if (newIndex.row > 0) newIndex.row--;
         break;
       case 'down':
-        newIndex.row++;
+        if (newIndex.row < this.gridService.rowLength - 1) newIndex.row++;
         break;
       case 'left':
         if (newIndex.col > 0) newIndex.col--;
         break;
       case 'right':
-        newIndex.col++;
+        if (newIndex.col < this.gridService.colLength - 1) newIndex.col++;
         break;
     }
     if (!holdShift) this._dragStart.set(newIndex.row, newIndex.col);
     this._dragEnd.set(newIndex.row, newIndex.col);
     this.emit();
-    this._dragEndEvent.emit(this._dragStart)
+    this._dragStartEvent.emit();
+    // Need a slight delay so that the previous cell input has time to disappear
+    setTimeout(() => this._dragEndEvent.emit(this._dragStart), 0);
   }
 
 

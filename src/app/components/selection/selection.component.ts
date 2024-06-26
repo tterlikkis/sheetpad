@@ -31,8 +31,6 @@ export class SelectionComponent implements OnInit, OnDestroy {
   onResize() {
     this.X = window.scrollX;
     this.Y = window.scrollY;
-    console.log(this.X)
-    console.log(this.Y)
   }
 
   private _addScrollOffset(rect?: DOMRect) {

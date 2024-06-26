@@ -70,7 +70,6 @@ export class TauriService {
     const str = 'Delete';
     const result = await isRegistered(str);
     if (result) return;
-    console.log('Registering delete');
     await register(str, () => this._delEvent.emit());
     this._delWasRegistered = true;
   }
@@ -107,7 +106,6 @@ export class TauriService {
   }
 
   private async _windowFocusOut() {
-    console.log('Unregistering');
     await unregisterAll();
   }
 }

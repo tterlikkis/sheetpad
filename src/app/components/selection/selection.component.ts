@@ -68,11 +68,10 @@ export class SelectionComponent implements OnInit, OnDestroy {
     );
     const bottomRightBox = this._addScrollOffset(
       document.getElementById(bottomRight.toString())?.getBoundingClientRect()
-    )
-    ;
+    );
     const border = document.getElementById('border-area');
     const grey = document.getElementById('grey-area');
-    
+
     if (!startBox || !topLeftBox || !bottomRightBox || !border || !grey) return;
     
     const box = this._addScrollOffset(new DOMRect(

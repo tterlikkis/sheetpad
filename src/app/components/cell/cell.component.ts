@@ -25,7 +25,8 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
   showInput: boolean = false;
   id: string = "";
   
-  private _sub?: Subscription;
+  private _startSub?: Subscription;
+  private _endSub?: Subscription;
 
   constructor(private readonly eventService: EventService) {}
 
@@ -33,6 +34,7 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
     this.id = this.index.toString();
     this._setCellWidth();
     this._setCellHeight();
+    this._consumeDragStartEvents();
     this._consumeDragEndEvent();
   }
 
@@ -46,16 +48,24 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this._sub?.unsubscribe();
+    this._startSub?.unsubscribe();
+    this._endSub?.unsubscribe();
+  }
+
+  private _consumeDragStartEvents() {
+    this._startSub?.unsubscribe();
+    this._startSub = this.eventService.dragStartEvent$.subscribe(() => 
+      this.showInput = false
+    );
   }
 
   private _consumeDragEndEvent() {
-    this._sub = this.eventService.dragEndEvent$.subscribe(val => {
+    this._endSub?.unsubscribe();
+    this._endSub = this.eventService.dragEndEvent$.subscribe(val => {
       if (Index.compare(val, this.index)) {
         this.showInput = true;
         setTimeout(() => this.input?.nativeElement.focus(), 0);
       }
-      else { this.input?.nativeElement.blur(); }
     });
   }
 

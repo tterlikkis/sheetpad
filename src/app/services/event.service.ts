@@ -29,6 +29,9 @@ export class EventService {
   private readonly _dragStart: Index = new Index();
   private readonly _dragEnd: Index = new Index();
 
+  private readonly _dragStartEvent: EventEmitter<void> = new EventEmitter();
+  public readonly dragStartEvent$: Observable<void> = this._dragStartEvent.asObservable();
+
   private readonly _dragEndEvent: EventEmitter<Index> = new EventEmitter<Index>();
   public readonly dragEndEvent$: Observable<Index> = this._dragEndEvent.asObservable();
 
@@ -148,6 +151,7 @@ export class EventService {
     this._dragEnd.set(row, col);
     this.emit();
     this.tauriService.unRegisterDelete();
+    this._dragStartEvent.emit();
   }
 
   public dragMove(row: number, col: number) {

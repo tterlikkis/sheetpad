@@ -1,7 +1,7 @@
 import { EventEmitter, Injectable} from '@angular/core';
 import { BehaviorSubject, Subscription, map } from 'rxjs';
-import { CellData } from '../models/cell-data.class';
-import { Index } from '../models/index.class';
+import { CellData } from '../../models/cell-data.class';
+import { Index } from '../../models/index.class';
 
 @Injectable({
   providedIn: 'root'

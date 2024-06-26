@@ -1,9 +1,9 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { GridService } from './grid.service';
-import { Index } from '../models/index.class';
+import { GridService } from '../grid/grid.service';
+import { Index } from '../../models/index.class';
 import { Observable } from 'rxjs';
-import { TauriService } from './tauri.service';
-import { SelectionPayload } from '../models/selection-payload.class';
+import { TauriService } from '../tauri/tauri.service';
+import { SelectionPayload } from '../../models/selection-payload.class';
 
 @Injectable({
   providedIn: 'root'

@@ -2,7 +2,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { isRegistered, register, unregister, unregisterAll } from '@tauri-apps/api/globalShortcut';
 import { listen } from '@tauri-apps/api/event';
 import { readText, writeText } from '@tauri-apps/api/clipboard';
-import { Indexable } from '../models/indexable.interface';
+import { Indexable } from '../../models/indexable.interface';
 
 @Injectable({
   providedIn: 'root'

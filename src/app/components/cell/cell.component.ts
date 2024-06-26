@@ -2,8 +2,8 @@ import { AfterViewInit, Component, ElementRef, HostBinding, Input, OnChanges, On
 import { Subscription } from 'rxjs';
 import { CellData } from 'src/app/models/cell-data.class';
 import { Index } from 'src/app/models/index.class';
-import { EventService } from 'src/app/services/event.service';
-import { GridService } from 'src/app/services/grid.service';
+import { EventService } from 'src/app/services/event/event.service';
+import { GridService } from 'src/app/services/grid/grid.service';
 
 @Component({
   selector: 'app-cell',

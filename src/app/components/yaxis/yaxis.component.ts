@@ -1,5 +1,5 @@
 import { Component, HostBinding, HostListener } from '@angular/core';
-import { GridService } from 'src/app/services/grid.service';
+import { GridService } from 'src/app/services/grid/grid.service';
 
 @Component({
   selector: 'app-yaxis',

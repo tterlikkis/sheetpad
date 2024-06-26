@@ -1,8 +1,7 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { RowColumn } from 'src/app/models/row-column.class';
-import { EventService } from 'src/app/services/event.service';
-import { GridService } from 'src/app/services/grid.service';
+import { EventService } from 'src/app/services/event/event.service';
+import { GridService } from 'src/app/services/grid/grid.service';
 
 @Component({
   selector: 'app-grid',

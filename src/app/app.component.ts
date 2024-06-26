@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { TauriService } from './services/tauri.service';
+import { TauriService } from './services/tauri/tauri.service';
 
 @Component({
   selector: 'app-root',

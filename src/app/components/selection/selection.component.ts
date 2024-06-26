@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs';
 import { Corner } from 'src/app/models/corner.enum';
 import { Index } from 'src/app/models/index.class';
 import { SelectionPayload } from 'src/app/models/selection-payload.class';
-import { EventService } from 'src/app/services/event.service';
+import { EventService } from 'src/app/services/event/event.service';
 
 @Component({
   selector: 'app-selection',

@@ -116,7 +116,8 @@ export class EventService {
   }
 
   private _consumeCtrlZEvent() {
-    // Need this event listener to prevent default input undo behavior
+    // Need this event listener to prevent 
+    // default input element undo behavior
     document.addEventListener('keydown', (event) => {
       if (event.ctrlKey && event.key === 'z') event.preventDefault();
     });
@@ -159,9 +160,9 @@ export class EventService {
     this.isSelected = false;
     this._dragStart.set(row, col);
     this._dragEnd.set(row, col);
-    this.emit();
     this.tauriService.unRegisterDelete();
     this._dragStartEvent.emit();
+    this.emit();
   }
 
   public dragMove(row: number, col: number) {

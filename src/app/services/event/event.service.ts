@@ -104,11 +104,11 @@ export class EventService {
   }
 
   private _consumeCtrlCEvent() {
-    this.tauriService.ctrlCEvent$.subscribe(() => this.copySelected());
+    this.tauriService.ctrlCEvent$.subscribe(() => this.copy());
   }
 
   private _consumeCtrlXEvent() {
-    this.tauriService.ctrlXEvent$.subscribe(() => this.copySelected(true));
+    this.tauriService.ctrlXEvent$.subscribe(() => this.copy(true));
   }
 
   private _consumeCtrlVEvent() {
@@ -137,7 +137,7 @@ export class EventService {
     this.tauriService.shiftArrowRightEvent$.subscribe(() => this._arrowEvent('right', true));
   }
 
-  public copySelected(isCut: boolean = false) {
+  public copy(isCut: boolean = false) {
     const topLeft = Index.topLeft(this._dragStart, this._dragEnd)
     const bottomRight = Index.bottomRight(this._dragStart, this._dragEnd);
     const list = Index.listBetween(topLeft, bottomRight);

@@ -51,12 +51,12 @@ export class ContextMenuComponent implements OnInit, OnDestroy {
   }
 
   cut() {
-    this.eventService.copySelected(true);
+    this.eventService.copy(true);
     this.clickOverlay();
   }
 
   copy () {
-    this.eventService.copySelected();
+    this.eventService.copy();
     this.clickOverlay();
   }
 

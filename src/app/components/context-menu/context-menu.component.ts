@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { Highlight } from 'src/app/models/highlight.enum';
 import { EventService } from 'src/app/services/event/event.service';
 import { GridService } from 'src/app/services/grid/grid.service';
 
@@ -10,6 +11,8 @@ import { GridService } from 'src/app/services/grid/grid.service';
 })
 export class ContextMenuComponent implements OnInit, OnDestroy {
 
+  colors: string[] = [];
+
   private _sub?: Subscription;
 
   constructor (
@@ -19,6 +22,7 @@ export class ContextMenuComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this._consumeContextMenuEvent();
+    this._getHighlightColors();
   }
 
   ngOnDestroy(): void {
@@ -43,6 +47,12 @@ export class ContextMenuComponent implements OnInit, OnDestroy {
       menuRef.style.left = `${val.x}px`;
       overlayRef.style.display = 'block';
     });
+  }
+
+  private _getHighlightColors() {
+    this.colors = Object.values(Highlight).filter(v => 
+      v !== Highlight.None && isNaN(Number(v))
+    );
   }
 
   undo() {

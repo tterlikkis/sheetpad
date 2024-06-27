@@ -20,6 +20,31 @@
   }
 }
 
+.highlight-item {
+  font-size: 12px;
+  padding: 1px;
+}
+
+.color-row {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.color {
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+
+  ::before {
+    content: "";
+    width: 24px;
+    height: 24px;
+    border-radius: 100%;
+    background-color: red;
+  }
+}
+
 .overlay {
   position: absolute;
   top: 0;

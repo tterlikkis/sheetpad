@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostBinding, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CellData } from 'src/app/models/cell-data.class';
+import { Highlight } from 'src/app/models/highlight.enum';
 import { Index } from 'src/app/models/index.class';
 import { EventService } from 'src/app/services/event/event.service';
 import { GridService } from 'src/app/services/grid/grid.service';
@@ -18,24 +19,13 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
   // I have to break it up into seperate properties so that changes are detected >:/
   @Input() index: Index = new Index();
   @Input() value: string = "";
-
   @Input() width: number = 80;
   @Input() height: number = 20;
+  @Input() highlight: Highlight = Highlight.None;
 
   id: string = "";
   
   showInput: boolean = false;
-  // public get showInput() {
-  //   return this._showInput;
-  // }
-  // private set showInput(v: boolean) {
-  //   if (v) setTimeout(() => {
-  //     console.log(this.input!.nativeElement.hidden);
-  //     this.input!.nativeElement.focus();
-  //   }, 1000);
-  //   else this.input?.nativeElement.blur();
-  //   this._showInput = v;
-  // }
   
   private _startSub?: Subscription;
   private _endSub?: Subscription;
@@ -56,6 +46,9 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
     }
     if ("height" in changes) {
       this._setCellHeight();
+    }
+    if ("highlight" in changes) {
+      this._setCellHighlight();
     }
   }
 
@@ -94,6 +87,10 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
 
   private _setCellHeight() {
     this.cellRef?.nativeElement.style.setProperty('--cell-height', `${this.height}px`);
+  }
+
+  private _setCellHighlight() {
+    this.cellRef?.nativeElement.style.setProperty('--cell-color', this.highlight);
   }
 
   valueChange(event: any) {

@@ -1,5 +1,11 @@
 <div id="menu" class="menu">
-  <div class="item">
-    Cut  
-  </div>
+  <div class="item" (click)="undo()">Undo</div>
+  <div class="g-div"></div>
+  <div class="item" (click)="cut()">Cut</div>
+  <div class="item" (click)="copy()">Copy</div>
+  <div class="item" (click)="paste()">Paste</div>
+  <div class="item" (click)="deleteClick()">Delete</div>
+  <div class="g-div"></div>
+  <div class="item">Select All</div>
 </div>
+<div id="overlay" class="overlay" (click)="clickOverlay()"></div>

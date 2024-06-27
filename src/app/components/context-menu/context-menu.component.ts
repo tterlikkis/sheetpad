@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { EventService } from 'src/app/services/event/event.service';
+import { GridService } from 'src/app/services/grid/grid.service';
 
 @Component({
   selector: 'app-context-menu',
@@ -11,7 +12,10 @@ export class ContextMenuComponent implements OnInit, OnDestroy {
 
   private _sub?: Subscription;
 
-  constructor (private readonly eventService: EventService) {}
+  constructor (
+    private readonly eventService: EventService,
+    private readonly gridService: GridService
+  ) {}
 
   ngOnInit(): void {
     this._consumeContextMenuEvent();
@@ -21,12 +25,48 @@ export class ContextMenuComponent implements OnInit, OnDestroy {
     this._sub?.unsubscribe();
   }
 
+  clickOverlay() {
+    const menuRef = document.getElementById('menu');
+    const overlayRef = document.getElementById('overlay');
+    if (!menuRef || !overlayRef) return;
+    menuRef.style.display = 'none';
+    overlayRef.style.display = 'none';
+  }
+
   private _consumeContextMenuEvent() {
     this._sub = this.eventService.contextMenuEvent$.subscribe(val => {
       const menuRef = document.getElementById('menu');
-      if (!menuRef) return;
+      const overlayRef = document.getElementById('overlay');
+      if (!menuRef || !overlayRef) return;
+      menuRef.style.display = 'flex';
       menuRef.style.top = `${val.y}px`;
       menuRef.style.left = `${val.x}px`;
+      overlayRef.style.display = 'block';
     });
+  }
+
+  undo() {
+    this.gridService.undoMostRecentChange();
+    this.clickOverlay();
+  }
+
+  cut() {
+    this.eventService.copySelected(true);
+    this.clickOverlay();
+  }
+
+  copy () {
+    this.eventService.copySelected();
+    this.clickOverlay();
+  }
+
+  paste() {
+    this.eventService.paste();
+    this.clickOverlay();
+  }
+
+  deleteClick() {
+    this.eventService.delete();
+    this.clickOverlay();
   }
 }

@@ -95,6 +95,7 @@ export class EventService {
 
   private _consumeContextMenuEvent() {
     addEventListener('contextmenu', (event) => {
+      event.preventDefault();
       const payload: ContextMenuPayload = {
         x: event.clientX, y: event.clientY
       };
@@ -103,22 +104,15 @@ export class EventService {
   }
 
   private _consumeCtrlCEvent() {
-    this.tauriService.ctrlCEvent$.subscribe(() => {
-      this._copySelected();
-    });
+    this.tauriService.ctrlCEvent$.subscribe(() => this.copySelected());
   }
 
   private _consumeCtrlXEvent() {
-    this.tauriService.ctrlXEvent$.subscribe(() => {
-      this._copySelected(true);
-    });
+    this.tauriService.ctrlXEvent$.subscribe(() => this.copySelected(true));
   }
 
   private _consumeCtrlVEvent() {
-    this.tauriService.ctrlVEvent$.subscribe(async () => {
-      const text = await this.tauriService.getClipboardText();
-      this.gridService.pasteToGrid(this._dragStart, text)
-    });
+    this.tauriService.ctrlVEvent$.subscribe(async () => this.paste());
   }
 
   private _consumeCtrlZEvent() {
@@ -133,11 +127,7 @@ export class EventService {
   }
 
   private _consumeDeleteEvent() {
-    this.tauriService.delEvent$.subscribe(() => {
-      const topLeft = Index.topLeft(this._dragStart, this._dragEnd)
-      const bottomRight = Index.bottomRight(this._dragStart, this._dragEnd);
-      this.gridService.clearGridSelection(Index.listBetween(topLeft, bottomRight));
-    });
+    this.tauriService.delEvent$.subscribe(() => this.delete());
   }
 
   private _consumeShiftArrowEvents() {
@@ -147,7 +137,7 @@ export class EventService {
     this.tauriService.shiftArrowRightEvent$.subscribe(() => this._arrowEvent('right', true));
   }
 
-  private _copySelected(isCut: boolean = false) {
+  public copySelected(isCut: boolean = false) {
     const topLeft = Index.topLeft(this._dragStart, this._dragEnd)
     const bottomRight = Index.bottomRight(this._dragStart, this._dragEnd);
     const list = Index.listBetween(topLeft, bottomRight);
@@ -156,6 +146,12 @@ export class EventService {
 
     this.tauriService.copyToClipboard(copyText);
     if (isCut) this.gridService.updateCellText(list, '');
+  }
+
+  public delete() {
+    const topLeft = Index.topLeft(this._dragStart, this._dragEnd)
+    const bottomRight = Index.bottomRight(this._dragStart, this._dragEnd);
+    this.gridService.clearGridSelection(Index.listBetween(topLeft, bottomRight));
   }
 
   public async dragStart(row: number, col: number) {
@@ -185,6 +181,11 @@ export class EventService {
     this._selectionEvent.emit({
       start: this._dragStart, end: this._dragEnd
     });
+  }
+
+  public async paste() {
+    const text = await this.tauriService.getClipboardText();
+    this.gridService.pasteToGrid(this._dragStart, text)
   }
 
 }

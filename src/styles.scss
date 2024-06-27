@@ -4,6 +4,7 @@
   --header-bg: #cccccc; // originally #bbbbbb
   --header-border: #4f4f4f;
   --my-red: #ff0000;
+  --my-blue: rgb(0, 64, 164);
 }
 
 body {
@@ -26,6 +27,14 @@ body {
   border-right: solid;
   border-bottom: solid;
   border-width: 1px;
+}
+
+.g-div {
+  width: 100%;
+  height: 1px;
+  border-top: solid;
+  border-width: 1px;
+  border-color: var(--header-border);
 }
 
 .fc {

@@ -69,4 +69,9 @@ export class ContextMenuComponent implements OnInit, OnDestroy {
     this.eventService.delete();
     this.clickOverlay();
   }
+
+  selectAll() {
+    this.eventService.selectAll();
+    this.clickOverlay();
+  }
 }

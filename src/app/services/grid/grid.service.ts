@@ -95,24 +95,33 @@ export class GridService {
     })
   }
 
-  public pasteToGrid(start: Index, text: string) {
+  public pasteToGrid(start: Index, text: string, skipUndoAction: boolean = false) {
     const leftMostCol = start.col;
     let row = start.row, col = start.col;
     let newGrid = [ ...this.grid ];
+
+    // Get indexes for undo action
     let indexes = [];
     for (const str of text.split('\n')) {
       for (const subStr of str.split('\t')) {
-        newGrid[row][col].text = subStr;
         indexes.push(new Index(row, col));
         col++;
       }
       col = leftMostCol;
       row++;
     }
+    if (!skipUndoAction) this._undoAction(indexes, this.readFromGrid(indexes), true);
+
+    // Actually update text
+    for (const str of text.split('\n')) {
+      for (const subStr of str.split('\t')) {
+        newGrid[row][col].text = subStr;
+        col++;
+      }
+      col = leftMostCol;
+      row++;
+    }
     this.grid = newGrid;
-    this._undoIndexes = indexes;
-    this._undoText = text;
-    this._undoIsPaste = true;
     this._refreshEvent.emit();
   }
 
@@ -145,9 +154,8 @@ export class GridService {
     if (this._undoIndexes.length < 1) return;
     const tempText = this._undoText;
     this._undoText = this.readFromGrid(this._undoIndexes);
-    if (this._undoIsPaste) this.pasteToGrid(this._undoIndexes[0], tempText);
-    else this.updateCellText(this._undoIndexes, tempText);
-    console.log(this._undoText)
+    if (this._undoIsPaste) this.pasteToGrid(this._undoIndexes[0], tempText, true);
+    else this.updateCellText(this._undoIndexes, tempText, true);
   }
 
   public updateColumnWidth(index: number, width: number) {
@@ -166,18 +174,15 @@ export class GridService {
     this.grid = newGrid;
   }
 
-  public updateCellText(cellIndexes: Index[], text: string) {
+  public updateCellText(indexes: Index[], text: string, skipUndoAction: boolean = false) {
     let newGrid = [ ...this.grid ];
-    if (cellIndexes.length < 1) return;
-    this._undoAction(
-      cellIndexes,
-      this.readFromGrid(cellIndexes),
-      false
-    );
-    for (const index of cellIndexes) {
+    if (indexes.length < 1) return;
+    if (!skipUndoAction) this._undoAction( indexes, this.readFromGrid(indexes), false);
+    for (const index of indexes) {
       newGrid[index.row][index.col].text = text;
     }
     this.grid = newGrid;
+    this._refreshEvent.emit();
   }
 
 }

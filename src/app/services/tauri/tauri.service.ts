@@ -21,6 +21,9 @@ export class TauriService {
   private readonly _arrowRightEvent = new EventEmitter();
   public readonly arrowRightEvent$ = this._arrowRightEvent.asObservable();
 
+  private readonly _ctrlAEvent = new EventEmitter();
+  public readonly ctrlAEvent$ = this._ctrlAEvent.asObservable();
+
   private readonly _ctrlCEvent = new EventEmitter();
   public readonly ctrlCEvent$ = this._ctrlCEvent.asObservable();
 
@@ -88,6 +91,7 @@ export class TauriService {
       'ArrowDown': this._arrowDownEvent, 
       'ArrowLeft': this._arrowLeftEvent, 
       'ArrowRight': this._arrowRightEvent, 
+      'CommandOrControl+A': this._ctrlAEvent,
       'CommandOrControl+C': this._ctrlCEvent, 
       'CommandOrControl+X': this._ctrlVEvent, 
       'CommandOrControl+V': this._ctrlVEvent,

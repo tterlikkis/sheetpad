@@ -48,6 +48,7 @@ export class EventService {
   ) { 
     this._consumeArrowEvents();
     this._consumeContextMenuEvent();
+    this._consumeCtrlAEvent();
     this._consumeCtrlCEvent();
     this._consumeCtrlXEvent();
     this._consumeCtrlVEvent();
@@ -103,6 +104,10 @@ export class EventService {
     });
   }
 
+  private _consumeCtrlAEvent() {
+    this.tauriService.ctrlAEvent$.subscribe(() => this.selectAll());
+  }
+
   private _consumeCtrlCEvent() {
     this.tauriService.ctrlCEvent$.subscribe(() => this.copy());
   }
@@ -122,7 +127,6 @@ export class EventService {
       if (event.ctrlKey && event.key === 'z') event.preventDefault();
     });
     this.tauriService.ctrlZEvent$.subscribe(() => {
-      console.log('firing change')
       this.gridService.undoMostRecentChange();
     })
   }
@@ -187,6 +191,20 @@ export class EventService {
   public async paste() {
     const text = await this.tauriService.getClipboardText();
     this.gridService.pasteToGrid(this._dragStart, text)
+  }
+
+  public selectAll() {
+    this.isSelected = true;
+    this.isDragging = true;
+    this._dragStartEvent.emit();
+    this._dragStart.set(0, 0);
+    this._dragEnd.set(
+      this.gridService.rowLength - 1, 
+      this.gridService.colLength - 1
+    );
+    this._dragEndEvent.emit(this._dragStart);
+    this.emit();
+    this.isDragging = false;
   }
 
 }

@@ -12,6 +12,7 @@ import { GridComponent } from './components/grid/grid.component';
 import { HeaderComponent } from './components/header/header.component';
 import { SelectionComponent } from './components/selection/selection.component';
 import { ContextMenuComponent } from './components/context-menu/context-menu.component';
+import { MenuComponent } from './components/menu/menu.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { ContextMenuComponent } from './components/context-menu/context-menu.com
     GridComponent,
     HeaderComponent,
     SelectionComponent,
-    ContextMenuComponent
+    ContextMenuComponent,
+    MenuComponent
   ],
   imports: [
     BrowserModule,

@@ -10,13 +10,13 @@ export class YaxisComponent {
 
   rows = this.gridService.rows$;
   
-  @HostBinding('style.top.px') top = 0;
+  @HostBinding('style.top.px') top = 20;
 
   constructor(private readonly gridService: GridService) {}
 
   @HostListener('window:scroll', ['$event'])
   onScroll(event: any) {
-    this.top = event.target.scrollingElement.scrollTop * -1; 
+    this.top = (event.target.scrollingElement.scrollTop * -1) + 20; 
   }
 
   changeRowHeight(index: number, height: number) {

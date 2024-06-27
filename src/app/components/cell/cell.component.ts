@@ -97,6 +97,6 @@ export class CellComponent implements OnChanges, AfterViewInit, OnDestroy {
   }
 
   valueChange(event: any) {
-    this.eventService.test(this.index, event);
+    this.eventService.updateText(this.index, event);
   }
 }

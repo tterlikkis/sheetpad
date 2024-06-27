@@ -51,12 +51,13 @@ export class EventService {
     this._consumeCtrlCEvent();
     this._consumeCtrlXEvent();
     this._consumeCtrlVEvent();
+    this._consumeCtrlZEvent();
     this._consumeDeleteEvent();
     this._consumeShiftArrowEvents();
   }
 
-  public test(index: Index, text: string) {
-    this.gridService.updateCellText(index, text);
+  public updateText(index: Index, text: string) {
+    this.gridService.updateCellText([index], text);
   }
 
   private _arrowEvent(direction: 'up' | 'down' | 'left' | 'right', holdShift: boolean = false) {
@@ -120,6 +121,17 @@ export class EventService {
     });
   }
 
+  private _consumeCtrlZEvent() {
+    // Need this event listener to prevent default input undo behavior
+    document.addEventListener('keydown', (event) => {
+      if (event.ctrlKey && event.key === 'z') event.preventDefault();
+    });
+    this.tauriService.ctrlZEvent$.subscribe(() => {
+      console.log('firing change')
+      this.gridService.undoMostRecentChange();
+    })
+  }
+
   private _consumeDeleteEvent() {
     this.tauriService.delEvent$.subscribe(() => {
       const topLeft = Index.topLeft(this._dragStart, this._dragEnd)
@@ -136,25 +148,11 @@ export class EventService {
   }
 
   private _copySelected(isCut: boolean = false) {
-    let copyText = "";
-
     const topLeft = Index.topLeft(this._dragStart, this._dragEnd)
     const bottomRight = Index.bottomRight(this._dragStart, this._dragEnd);
     const list = Index.listBetween(topLeft, bottomRight);
 
-    if (list.length === 0) return;
-    let currentRow = list[0].row
-    for (let i = 0; i < list.length; i++) {
-      const index = list[i];
-      if (currentRow !== index.row) {
-        copyText += '\n';
-      }
-      copyText += this.gridService.grid[index.row][index.col].text 
-      if (i !== list.length - 1) {
-        copyText += '\t';
-      }
-      currentRow = index.row;
-    }
+    const copyText = this.gridService.readFromGrid(list);
 
     this.tauriService.copyToClipboard(copyText);
     if (isCut) this.gridService.updateCellText(list, '');

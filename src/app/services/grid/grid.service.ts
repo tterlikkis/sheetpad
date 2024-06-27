@@ -44,6 +44,10 @@ export class GridService {
   private readonly _refreshEvent = new EventEmitter<void>();
   public readonly refreshEvent = this._refreshEvent.asObservable();
 
+  private _undoIndexes: Index[] = [];
+  private _undoText: string = "";
+  private _undoIsPaste: boolean = false;
+
   constructor() {
     this._generateGrid();
     this._consumeRowChanges();
@@ -95,16 +99,55 @@ export class GridService {
     const leftMostCol = start.col;
     let row = start.row, col = start.col;
     let newGrid = [ ...this.grid ];
+    let indexes = [];
     for (const str of text.split('\n')) {
       for (const subStr of str.split('\t')) {
         newGrid[row][col].text = subStr;
+        indexes.push(new Index(row, col));
         col++;
       }
       col = leftMostCol;
       row++;
     }
     this.grid = newGrid;
+    this._undoIndexes = indexes;
+    this._undoText = text;
+    this._undoIsPaste = true;
     this._refreshEvent.emit();
+  }
+
+  public readFromGrid(indexes: Index[]) {
+    let result = ""
+    if (indexes.length > 0) {
+      let currentRow = indexes[0].row
+      for (let i = 0; i < indexes.length; i++) {
+        const index = indexes[i];
+        if (currentRow !== index.row) {
+          result += '\n';
+        }
+        result += this.grid[index.row][index.col].text 
+        if (i !== indexes.length - 1) {
+          result += '\t';
+        }
+        currentRow = index.row;
+      }
+    }
+    return result;
+  }
+
+  private _undoAction(indexes: Index[], text: string, isPaste: boolean) {
+    this._undoIndexes = indexes;
+    this._undoText = text;
+    this._undoIsPaste = isPaste;
+  }
+
+  public undoMostRecentChange() {
+    if (this._undoIndexes.length < 1) return;
+    const tempText = this._undoText;
+    this._undoText = this.readFromGrid(this._undoIndexes);
+    if (this._undoIsPaste) this.pasteToGrid(this._undoIndexes[0], tempText);
+    else this.updateCellText(this._undoIndexes, tempText);
+    console.log(this._undoText)
   }
 
   public updateColumnWidth(index: number, width: number) {
@@ -123,16 +166,16 @@ export class GridService {
     this.grid = newGrid;
   }
 
-  public updateCellText(cellIndexes: Index | Index[], text: string) {
+  public updateCellText(cellIndexes: Index[], text: string) {
     let newGrid = [ ...this.grid ];
-    if (Array.isArray(cellIndexes)) {
-      console.log('is array')
-      for (const index of cellIndexes) {
-        newGrid[index.row][index.col].text = text;
-      }
-    }
-    else {
-      newGrid[cellIndexes.row][cellIndexes.col].text = text;
+    if (cellIndexes.length < 1) return;
+    this._undoAction(
+      cellIndexes,
+      this.readFromGrid(cellIndexes),
+      false
+    );
+    for (const index of cellIndexes) {
+      newGrid[index.row][index.col].text = text;
     }
     this.grid = newGrid;
   }

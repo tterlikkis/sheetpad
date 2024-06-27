@@ -54,7 +54,9 @@ export class EventService {
     this._consumeCtrlVEvent();
     this._consumeCtrlZEvent();
     this._consumeDeleteEvent();
+    this._consumeEnterEvents();
     this._consumeShiftArrowEvents();
+    this._consumeTabEvents();
   }
 
   public updateText(index: Index, text: string) {
@@ -135,11 +137,19 @@ export class EventService {
     this.tauriService.delEvent$.subscribe(() => this.delete());
   }
 
+  private _consumeEnterEvents() {
+    this.tauriService.enterEvent$.subscribe(() => this._arrowEvent('down', false));
+  }
+
   private _consumeShiftArrowEvents() {
     this.tauriService.shiftArrowUpEvent$.subscribe(() =>  this._arrowEvent('up', true));
     this.tauriService.shiftArrowDownEvent$.subscribe(() => this._arrowEvent('down', true));
     this.tauriService.shiftArrowLeftEvent$.subscribe(() => this._arrowEvent('left', true));
     this.tauriService.shiftArrowRightEvent$.subscribe(() => this._arrowEvent('right', true));
+  }
+
+  private _consumeTabEvents() {
+    this.tauriService.tabEvent$.subscribe(() => this._arrowEvent('right', false));
   }
 
   public copy(isCut: boolean = false) {
@@ -177,7 +187,7 @@ export class EventService {
   public dragEnd() {
     this.isSelected = true;
     this.isDragging = false;
-    this.tauriService.registerDelete();
+    this.tauriService.registerSelectionEvents();
     this.emit();
     this._dragEndEvent.next(this._dragStart);
   }

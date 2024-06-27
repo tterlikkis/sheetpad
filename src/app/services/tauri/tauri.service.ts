@@ -39,6 +39,9 @@ export class TauriService {
   private readonly _delEvent = new EventEmitter();
   public readonly delEvent$ = this._delEvent.asObservable();
 
+  private readonly _enterEvent = new EventEmitter();
+  public readonly enterEvent$ = this._enterEvent.asObservable();
+
   private readonly _shiftArrowUpEvent = new EventEmitter();
   public readonly shiftArrowUpEvent$ = this._shiftArrowUpEvent.asObservable();
 
@@ -51,7 +54,10 @@ export class TauriService {
   private readonly _shiftArrowRightEvent = new EventEmitter();
   public readonly shiftArrowRightEvent$ = this._shiftArrowRightEvent.asObservable();
 
-  private _delWasRegistered: boolean = false;
+  private readonly _tabEvent = new EventEmitter();
+  public readonly tabEvent$ = this._tabEvent.asObservable();
+
+  private _selEventsWereRegistered: boolean = false;
 
   constructor() { 
     this._consumeWindowEvents();
@@ -72,17 +78,22 @@ export class TauriService {
     return (await readText()) || '';
   }
 
-  public async registerDelete() {
-    const str = 'Delete';
-    const result = await isRegistered(str);
-    if (result) return;
-    await register(str, () => this._delEvent.emit());
-    this._delWasRegistered = true;
+  public async registerSelectionEvents() {
+    const events: Indexable<EventEmitter<void>> = {
+      'Delete': this._delEvent,
+      'Enter': this._enterEvent,
+      'Tab': this._tabEvent
+    };
+    for (const key in events) {
+      if (await isRegistered(key)) continue;
+      await register(key, () => events[key].emit());
+    }
+    this._selEventsWereRegistered = true;
   }
 
   public async unRegisterDelete() {
     await unregister('Delete');
-    this._delWasRegistered = false;
+    this._selEventsWereRegistered = false;
   }
 
   private async _windowFocus() {
@@ -101,16 +112,11 @@ export class TauriService {
       'Shift+ArrowLeft': this._shiftArrowLeftEvent,
       'Shift+ArrowRight': this._shiftArrowRightEvent,
     }
-
     for (const key in events) {
-      const result = await isRegistered(key);
-      if (result) continue;
-      await register(key, () => {
-        events[key].emit()
-      });
+      if (await isRegistered(key)) continue;
+      await register(key, () => events[key].emit());
     }
-
-    if (this._delWasRegistered) this.registerDelete();
+    if (this._selEventsWereRegistered) this.registerSelectionEvents();
   }
 
   private async _windowFocusOut() {

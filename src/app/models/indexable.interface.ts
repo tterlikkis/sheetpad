@@ -1,1 +1,1 @@
-export interface Indexable<T = any>{ [key: string | number]: T | any }
+export interface Indexable<T>{ [key: string | number]: T }

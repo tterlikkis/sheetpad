@@ -9,7 +9,6 @@
   background-color: white;
   z-index: 102;
   height: 20px;
-  padding-left: 4px;
   border-bottom: solid;
   border-width: 1px;
   border-color: var(--header-border);
@@ -21,11 +20,16 @@
   width: fit-content;
   text-align: center;
   height: 100%;
-  padding-inline: 2px;
+  padding-top: 2px;
+  padding-inline: 4px;
 
   &:hover {
     cursor: pointer;
     background-color: var(--my-blue);
     color: white;
+  }
+
+  &:first-of-type {
+    padding-left: 4px;
   }
 }

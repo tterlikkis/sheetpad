@@ -5,7 +5,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class CellIndexPipe implements PipeTransform {
 
-  transform(value: unknown, ...args: unknown[]): string | number {
+  transform(value: number | string): string | number {
     if (typeof value === "number") return this.numberToString(value);
     if (typeof value === "string") return this.stringToNumber(value);
     return "";

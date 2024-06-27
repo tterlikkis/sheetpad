@@ -4,9 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'cellInputWidth'
 })
 export class CellInputWidthPipe implements PipeTransform {
-
-  transform(value: unknown, ...args: unknown[]): number {
-    return typeof value === "number" && value > 0 ? value : 1;
+  transform(value: number): number {
+    return value > 0 ? value : 1;
   }
-
 }

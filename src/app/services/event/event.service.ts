@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { TauriService } from '../tauri/tauri.service';
 import { SelectionPayload } from '../../models/selection-payload.class';
 import { ContextMenuPayload } from 'src/app/models/context-menu-payload.interface';
+import { Highlight } from 'src/app/models/highlight.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -198,6 +199,12 @@ export class EventService {
     });
   }
 
+  private _getSelected() {
+    const topLeft = Index.topLeft(this._dragStart, this._dragEnd);
+    const bottomRight = Index.bottomRight(this._dragStart, this._dragEnd);
+    return Index.listBetween(topLeft, bottomRight);
+  }
+
   public async paste() {
     const text = await this.tauriService.getClipboardText();
     this.gridService.pasteToGrid(this._dragStart, text)
@@ -215,6 +222,10 @@ export class EventService {
     this._dragEndEvent.emit(this._dragStart);
     this.emit();
     this.isDragging = false;
+  }
+
+  public setHighlight(highlight: Highlight) {
+    this.gridService.updateCellHighlight(this._getSelected(), highlight);
   }
 
 }

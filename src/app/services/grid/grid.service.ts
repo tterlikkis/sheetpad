@@ -2,6 +2,8 @@ import { EventEmitter, Injectable} from '@angular/core';
 import { BehaviorSubject, Subscription, map } from 'rxjs';
 import { CellData } from '../../models/cell-data.class';
 import { Index } from '../../models/index.class';
+import { Highlight } from 'src/app/models/highlight.enum';
+import { UndoAction } from 'src/app/models/undo-action.class';
 
 @Injectable({
   providedIn: 'root'
@@ -44,9 +46,7 @@ export class GridService {
   private readonly _refreshEvent = new EventEmitter<void>();
   public readonly refreshEvent = this._refreshEvent.asObservable();
 
-  private _undoIndexes: Index[] = [];
-  private _undoText: string = "";
-  private _undoIsPaste: boolean = false;
+  private _undoActions: UndoAction[] = [];
 
   constructor() {
     this._generateGrid();
@@ -79,7 +79,7 @@ export class GridService {
       if (val.length !== this._colLength) {
         this._colLength = val.length;
       }
-    })
+    });
   }
 
   private _consumeRowChanges() {
@@ -92,29 +92,20 @@ export class GridService {
         }
         this._rowLength = val.length;
       }
-    })
+    });
   }
 
-  public pasteToGrid(start: Index, text: string, skipUndoAction: boolean = false) {
+  public pasteToGrid(start: Index, text: string) {
     const leftMostCol = start.col;
     let row = start.row, col = start.col;
     let newGrid = [ ...this.grid ];
-
-    // Get indexes for undo action
-    let indexes = [];
+    this._undoActions = [];
     for (const str of text.split('\n')) {
       for (const subStr of str.split('\t')) {
-        indexes.push(new Index(row, col));
-        col++;
-      }
-      col = leftMostCol;
-      row++;
-    }
-    if (!skipUndoAction) this._undoAction(indexes, this.readFromGrid(indexes), true);
-
-    // Actually update text
-    for (const str of text.split('\n')) {
-      for (const subStr of str.split('\t')) {
+        this._undoActions.push({
+          index: new Index(row, col), 
+          text: newGrid[row][col].text
+        });
         newGrid[row][col].text = subStr;
         col++;
       }
@@ -144,18 +135,23 @@ export class GridService {
     return result;
   }
 
-  private _undoAction(indexes: Index[], text: string, isPaste: boolean) {
-    this._undoIndexes = indexes;
-    this._undoText = text;
-    this._undoIsPaste = isPaste;
-  }
-
   public undoMostRecentChange() {
-    if (this._undoIndexes.length < 1) return;
-    const tempText = this._undoText;
-    this._undoText = this.readFromGrid(this._undoIndexes);
-    if (this._undoIsPaste) this.pasteToGrid(this._undoIndexes[0], tempText, true);
-    else this.updateCellText(this._undoIndexes, tempText, true);
+    let newGrid = [ ...this.grid ];
+    let newActions: UndoAction[] = [];
+    for (const action of this._undoActions) {
+      let cell = newGrid[action.index.row][action.index.row];
+      if (action.text) {
+        newActions.push({ index: action.index, text: cell.text });
+        cell.text = action.text;
+      }
+      else if (action.highlight) {
+        newActions.push({ index: action.index, highlight: cell.highlight });
+        cell.highlight = action.highlight;
+      }
+    }
+    this._undoActions = newActions;
+    this.grid = newGrid;
+    this._refreshEvent.emit();
   }
 
   public updateColumnWidth(index: number, width: number) {
@@ -174,11 +170,30 @@ export class GridService {
     this.grid = newGrid;
   }
 
-  public updateCellText(indexes: Index[], text: string, skipUndoAction: boolean = false) {
+  public updateCellHighlight(indexes: Index[], color: Highlight) {
     let newGrid = [ ...this.grid ];
     if (indexes.length < 1) return;
-    if (!skipUndoAction) this._undoAction( indexes, this.readFromGrid(indexes), false);
+    this._undoActions = [];
     for (const index of indexes) {
+      this._undoActions.push({
+        index: index,
+        highlight: newGrid[index.row][index.col].highlight
+      });
+      newGrid[index.row][index.col].highlight = color;
+    }
+    this.grid = newGrid;
+    this._refreshEvent.emit();
+  }
+
+  public updateCellText(indexes: Index[], text: string) {
+    let newGrid = [ ...this.grid ];
+    if (indexes.length < 1) return;
+    this._undoActions = [];
+    for (const index of indexes) {
+      this._undoActions.push({
+        index: index, 
+        text: newGrid[index.row][index.col].text
+      });
       newGrid[index.row][index.col].text = text;
     }
     this.grid = newGrid;

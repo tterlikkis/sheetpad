@@ -11,7 +11,7 @@ import { GridService } from 'src/app/services/grid/grid.service';
 })
 export class ContextMenuComponent implements OnInit, OnDestroy {
 
-  colors: string[] = [];
+  colors: Highlight[] = [];
 
   private _sub?: Subscription;
 
@@ -83,5 +83,9 @@ export class ContextMenuComponent implements OnInit, OnDestroy {
   selectAll() {
     this.eventService.selectAll();
     this.clickOverlay();
+  }
+
+  setHighlight(highlight: Highlight) {
+    this.eventService.setHighlight(highlight);
   }
 }

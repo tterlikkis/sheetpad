@@ -12,7 +12,7 @@
     <span>Highlight</span>
     <div class="color-row">
       <ng-container *ngFor="let c of colors">
-        <div class="color" [style.backgroundColor]="c"></div>
+        <div class="color" [style.backgroundColor]="c" (click)="setHighlight(c)"></div>
       </ng-container>
     </div>
   </div>

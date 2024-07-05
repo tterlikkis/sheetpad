@@ -1,4 +1,4 @@
-<div id="menu" class="menu">
+<div id="context-menu" class="menu">
   <div class="item g-noselect" (click)="undo()">Undo</div>
   <div class="g-div"></div>
   <div class="item g-noselect" (click)="cut()">Cut</div>
@@ -11,10 +11,14 @@
   <div class="highlight-item">
     <span>Highlight</span>
     <div class="color-row">
-      <ng-container *ngFor="let c of colors">
-        <div class="color" [style.backgroundColor]="c" (click)="setHighlight(c)"></div>
+      <ng-container *ngFor="let c of colors; let f = first">
+          <div 
+            class="color" 
+            [style.backgroundColor]="c === 'transparent' ? '#fff' : c" 
+            (click)="setHighlight(c)"
+          ></div>
       </ng-container>
     </div>
   </div>
 </div>
-<div id="overlay" class="overlay" (click)="clickOverlay()"></div>
+<div id="context-overlay" class="overlay" (click)="clickOverlay()"></div>

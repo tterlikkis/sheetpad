@@ -30,8 +30,8 @@ export class ContextMenuComponent implements OnInit, OnDestroy {
   }
 
   clickOverlay() {
-    const menuRef = document.getElementById('menu');
-    const overlayRef = document.getElementById('overlay');
+    const menuRef = document.getElementById('context-menu');
+    const overlayRef = document.getElementById('context-overlay');
     if (!menuRef || !overlayRef) return;
     menuRef.style.display = 'none';
     overlayRef.style.display = 'none';
@@ -39,8 +39,8 @@ export class ContextMenuComponent implements OnInit, OnDestroy {
 
   private _consumeContextMenuEvent() {
     this._sub = this.eventService.contextMenuEvent$.subscribe(val => {
-      const menuRef = document.getElementById('menu');
-      const overlayRef = document.getElementById('overlay');
+      const menuRef = document.getElementById('context-menu');
+      const overlayRef = document.getElementById('context-overlay');
       if (!menuRef || !overlayRef) return;
       menuRef.style.display = 'flex';
       menuRef.style.top = `${val.y}px`;
@@ -50,9 +50,7 @@ export class ContextMenuComponent implements OnInit, OnDestroy {
   }
 
   private _getHighlightColors() {
-    this.colors = Object.values(Highlight).filter(v => 
-      v !== Highlight.None && isNaN(Number(v))
-    );
+    this.colors = Object.values(Highlight).filter(v => isNaN(Number(v)));
   }
 
   undo() {

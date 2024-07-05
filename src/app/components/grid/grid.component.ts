@@ -39,16 +39,18 @@ export class GridComponent implements OnInit, OnDestroy {
   onMouseDown(event: MouseEvent, row: number, col: number) {
     event.preventDefault();
     event.stopImmediatePropagation();
-    this.eventService.dragStart(row, col);
+    if (event.button !== 2 || !this.eventService.isSelected)
+      this.eventService.dragStart(row, col);
   }
 
   onMouseEnter(row: number, col: number) {
-    if (!this.eventService.isDragging) return;
-    this.eventService.dragMove(row, col);
+    if (this.eventService.isDragging)
+      this.eventService.dragMove(row, col);
   }
 
-  onMouseUp() {
-    this.eventService.dragEnd();
+  onMouseUp(event: MouseEvent) {
+    if (event.button !== 2 || !this.eventService.isSelected)
+      this.eventService.dragEnd();
   }
 
   // generateGrid() {

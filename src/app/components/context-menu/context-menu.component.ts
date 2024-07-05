@@ -30,6 +30,7 @@ export class ContextMenuComponent implements OnInit, OnDestroy {
   }
 
   clickOverlay() {
+    console.log('click over lay')
     const menuRef = document.getElementById('context-menu');
     const overlayRef = document.getElementById('context-overlay');
     if (!menuRef || !overlayRef) return;
@@ -43,8 +44,8 @@ export class ContextMenuComponent implements OnInit, OnDestroy {
       const overlayRef = document.getElementById('context-overlay');
       if (!menuRef || !overlayRef) return;
       menuRef.style.display = 'flex';
-      menuRef.style.top = `${val.y}px`;
-      menuRef.style.left = `${val.x}px`;
+      menuRef.style.top = `${val.y + window.scrollY}px`;
+      menuRef.style.left = `${val.x + window.scrollX}px`;
       overlayRef.style.display = 'block';
     });
   }

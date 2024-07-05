@@ -13,7 +13,7 @@
             [highlight]="cell.highlight"
             (mousedown)="onMouseDown($event, i, j)"
             (mouseenter)="onMouseEnter(i, j)"
-            (mouseup)="onMouseUp()"
+            (mouseup)="onMouseUp($event)"
           ></app-cell>
         </ng-container>
       </div>
